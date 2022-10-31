@@ -1,0 +1,4 @@
+rootProject.name = 'mapper_kt'
+include ':lib'
+
+
