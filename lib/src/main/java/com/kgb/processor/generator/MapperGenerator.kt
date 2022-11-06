@@ -49,15 +49,15 @@ class MapperGenerator private constructor() {
     fun generateFile(): String {
         val packageName = processingEnv.elementUtils.getPackageOf(el)
         val mapperName = el.simpleName
-        content
-            .append("package ${packageName.qualifiedName}.mapper \n")
-            .append("import com.kgb.processor.AbstractMapper \n")
-            .append("import ${packageName.qualifiedName}.${el.simpleName} \n\n")
-            .append("class ${mapperName}Mapper(mappedObject : ${el.simpleName}) ")
-            .append(": AbstractMapper<${mapperName}>(mappedObject) {\n")
-//                .append(prepareConvertToObjectMethod(el))
-            .append(prepareToMapMethod(el))
-            .append("\n}\n")
+        content.append(ClassGenerator()
+            .setClassSignature("${mapperName}Mapper(mappedObject : ${el.simpleName})")
+            .setPackage("${packageName.qualifiedName}.mapper")
+            .addImport("com.kgb.processor.mapper.AbstractMapper")
+            .addImport("${packageName.qualifiedName}.${el.simpleName}")
+            .setSuperClassSignature("", "AbstractMapper<${mapperName}>(mappedObject)")
+            .overrideMethod("toMap", emptyList(), "Map<String, Any?>", generateToMapMethodContent(el))
+            .generate()
+        )
 
         try {
             val file = processingEnv.filer.createResource(
@@ -74,24 +74,21 @@ class MapperGenerator private constructor() {
         return content.toString()
     }
 
-    private fun prepareToMapMethod(element: Element): String {
+    private fun generateToMapMethodContent(element: Element): String {
 
         val builder = StringBuilder()
-        val indent = "  "
+        val indent = "    "
         return builder
-            .append("\n")
-            .append("\noverride fun toMap(): Map<String, Any?> {\n")
-            .append("${indent}val result = mapOf(\n")
-            .append("${addMappedField(element)}")
-            .append("   )\n")
+            .append("${indent}val result = mapOf<String, Any?>(\n")
+            .append("$indent    ${addMappedField(element)}")
+            .append("${indent})\n")
 //            .append(prepareMappedField(element))
-            .append("   return result\n}")
-            .append("\n")
+            .append("${indent}return result\n")
             .toString()
     }
 
     private fun addMappedField(element: Element): String {
-        val indent = "      "
+        val indent = "    "
         val builder = StringBuilder()
         var first = true
         element.enclosedElements.forEach { el ->
