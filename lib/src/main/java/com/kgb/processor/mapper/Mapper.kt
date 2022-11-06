@@ -1,4 +1,4 @@
-package com.kgb.processor
+package com.kgb.processor.mapper
 
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)

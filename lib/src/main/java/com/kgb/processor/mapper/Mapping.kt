@@ -1,4 +1,4 @@
-package com.kgb.processor
+package com.kgb.processor.mapper
 
 @Target(AnnotationTarget.FIELD)
 @Retention(AnnotationRetention.RUNTIME)
