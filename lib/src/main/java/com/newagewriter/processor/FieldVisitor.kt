@@ -1,8 +1,7 @@
-package com.kgb.processor
+package com.newagewriter.processor
 
 import javax.lang.model.element.*
 import javax.lang.model.util.AbstractElementVisitor8
-import javax.lang.model.util.ElementScanner8
 
 class FieldVisitor(private val builder: java.lang.StringBuilder) : AbstractElementVisitor8<Any, Any>() {
     override fun visitVariable(e: VariableElement?, p: Any?): Any {

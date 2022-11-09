@@ -1,4 +1,4 @@
-package com.kgb.processor.generator
+package com.newagewriter.processor.generator
 
 import kotlin.text.StringBuilder
 
@@ -28,6 +28,10 @@ class ClassGenerator {
         if (this.packageName != packageName && imports.contains(packageName))
             imports.add(packageName)
         return this
+    }
+
+    fun addInterface(classObj: Class<out Any>): ClassGenerator {
+        return addInterface(classObj.`package`.name, classObj.simpleName)
     }
 
     fun setSuperClassSignature(packageName: String, superClassName: String): ClassGenerator {

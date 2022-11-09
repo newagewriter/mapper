@@ -1,4 +1,4 @@
-package com.kgb.processor.mapper
+package com.newagewriter.processor.mapper
 
 @Target(AnnotationTarget.FIELD)
 @Retention(AnnotationRetention.RUNTIME)
