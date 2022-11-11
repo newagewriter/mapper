@@ -1,4 +1,4 @@
-package com.kgb
+package com.newagewriter.example.model
 
 enum class UserStatus {
     ACTIVE,

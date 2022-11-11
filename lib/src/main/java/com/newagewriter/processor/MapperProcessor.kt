@@ -1,9 +1,11 @@
-package com.kgb.processor
+package com.newagewriter.processor
 
 import com.google.auto.service.AutoService
-import com.kgb.processor.generator.ClassGenerator
-import com.kgb.processor.generator.MapperGenerator
-import com.kgb.processor.mapper.Mapper
+import com.newagewriter.processor.generator.ClassGenerator
+import com.newagewriter.processor.generator.MapperGenerator
+import com.newagewriter.processor.mapper.AbstractMapper
+import com.newagewriter.processor.mapper.Mapper
+import com.newagewriter.processor.mapper.MapperFactory
 import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.RoundEnvironment
 import javax.annotation.processing.SupportedAnnotationTypes
@@ -15,7 +17,7 @@ import javax.tools.StandardLocation
 
 @AutoService(Process::class)
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
-@SupportedAnnotationTypes("com.kgb.processor.mapper.Mapper")
+@SupportedAnnotationTypes("com.newagewriter.processor.mapper.Mapper")
 class MapperProcessor : AbstractProcessor() {
     override fun process(annotations: MutableSet<out TypeElement>?, roundEnv: RoundEnvironment?): Boolean {
         processingEnv.messager.printMessage(Diagnostic.Kind.NOTE, "process mappers")
@@ -25,7 +27,7 @@ class MapperProcessor : AbstractProcessor() {
             val mapperBuilder = MapperGenerator.Builder(el, processingEnv)
             mapperList[el.simpleName.toString()] = packageName.qualifiedName.toString()
             mapperBuilder
-                .addSuperClass("com.kgb.processor", "AbstractMapper")
+                .addSuperClass(AbstractMapper::class.java)
                 .addExtraImport("${packageName.qualifiedName}.${el.simpleName}")
                 .setFileLocation(StandardLocation.SOURCE_OUTPUT)
                 .setModuleAndPkg(packageName.qualifiedName.toString())
@@ -34,8 +36,8 @@ class MapperProcessor : AbstractProcessor() {
         }
         val mapperUtilsClass = ClassGenerator()
             .setClassType(ClassGenerator.ClassType.OBJECT)
-            .setPackage("com.kgb.processor.mapper")
-            .addInterface("com.kgb.processor.mapper","MapperFactory")
+            .setPackage("com.newagewriter.processor.mapper")
+            .addInterface(MapperFactory::class.java)
             .setClassSignature("MapperUtils")
             .setInitBlock("AbstractMapper.Factory = this")
             .overrideMethod("<T> of", listOf("obj: T"), "AbstractMapper<T>?", getOfMethodContent(mapperList))
