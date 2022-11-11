@@ -1,4 +1,4 @@
-package com.kgb.processor.generator
+package com.newagewriter.processor.generator
 
 import java.lang.StringBuilder
 import javax.annotation.processing.ProcessingEnvironment
@@ -30,6 +30,10 @@ class MapperGenerator private constructor() {
             return this
         }
 
+        fun addSuperClass(classObj: Class<out Any>): Builder {
+            return addSuperClass(classObj.`package`.name, classObj.simpleName)
+        }
+
         fun addExtraImport(extraImport: String): Builder {
             mapper.extraImports.add(extraImport)
             return this
@@ -52,7 +56,7 @@ class MapperGenerator private constructor() {
         content.append(ClassGenerator()
             .setClassSignature("${mapperName}Mapper(mappedObject : ${el.simpleName})")
             .setPackage("${packageName.qualifiedName}.mapper")
-            .addImport("com.kgb.processor.mapper.AbstractMapper")
+            .addImport("com.newagewriter.processor.mapper.AbstractMapper")
             .addImport("${packageName.qualifiedName}.${el.simpleName}")
             .setSuperClassSignature("", "AbstractMapper<${mapperName}>(mappedObject)")
             .overrideMethod("toMap", emptyList(), "Map<String, Any?>", generateToMapMethodContent(el))
@@ -62,7 +66,7 @@ class MapperGenerator private constructor() {
         try {
             val file = processingEnv.filer.createResource(
                 sourceOutput,
-                moduleAndPkg,
+                "$moduleAndPkg",
                 "${mapperName}Mapper.kt"
             );
             val writer = file.openWriter()

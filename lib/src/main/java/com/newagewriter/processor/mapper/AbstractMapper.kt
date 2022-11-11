@@ -1,4 +1,4 @@
-package com.kgb.processor.mapper
+package com.newagewriter.processor.mapper
 
 abstract class AbstractMapper<T>(protected val mappedObj: T) {
     abstract fun toMap(): Map<String, Any?>
@@ -35,7 +35,7 @@ abstract class AbstractMapper<T>(protected val mappedObj: T) {
     }
 
     private fun<T> of(value: T): AbstractMapper<T>? {
-        Class.forName("com.kgb.processor.mapper.MapperUtils")
+        Class.forName("com.newagewriter.processor.mapper.MapperUtils")
         return Factory.of(value)
     }
 
