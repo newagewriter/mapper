@@ -1,5 +1,6 @@
 package com.newagewriter.processor.generator
 
+import com.newagewriter.processor.converter.MapperConverter
 import java.lang.StringBuilder
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.Element
@@ -54,12 +55,13 @@ class MapperGenerator private constructor() {
         val packageName = processingEnv.elementUtils.getPackageOf(el)
         val mapperName = el.simpleName
         content.append(ClassGenerator()
-            .setClassSignature("${mapperName}Mapper(mappedObject : ${el.simpleName})")
+            .setClassSignature("${mapperName}Mapper(mappedObject : ${el.simpleName}?, map: Map<String, Any?>? = null)")
             .setPackage("${packageName.qualifiedName}.mapper")
             .addImport("com.newagewriter.processor.mapper.AbstractMapper")
             .addImport("${packageName.qualifiedName}.${el.simpleName}")
-            .setSuperClassSignature("", "AbstractMapper<${mapperName}>(mappedObject)")
+            .setSuperClassSignature("", "AbstractMapper<${mapperName}>(mappedObject, map)")
             .overrideMethod("toMap", emptyList(), "Map<String, Any?>", generateToMapMethodContent(el))
+            .overrideMethod("createMappedObj", emptyList(), el.simpleName.toString(), generateFromMapMethodContent(el))
             .generate()
         )
 
@@ -83,12 +85,39 @@ class MapperGenerator private constructor() {
         val builder = StringBuilder()
         val indent = "    "
         return builder
+            .appendLine("return obj?.let { o ->")
             .append("${indent}val result = mapOf<String, Any?>(\n")
             .append("$indent    ${addMappedField(element)}")
             .append("${indent})\n")
 //            .append(prepareMappedField(element))
-            .append("${indent}return result\n")
+            .append("${indent}result\n")
+            .append("} ?: throw NullPointerException(\"Cannot convert object toMap for null value\")\n")
             .toString()
+    }
+
+    private fun generateFromMapMethodContent(element: Element): String {
+
+        val builder = StringBuilder()
+        val indent = "    "
+        StringBuilder::class.java
+        val fields = getFieldsName(element)
+        builder.appendLine("return  objMap?.let { map -> ")
+        builder.appendLine("${element.simpleName}(")
+        var first = true
+        fields.forEach { field ->
+            if (!first) {
+                builder.append(",\n")
+            }
+            builder.append("${field.simpleName} = ${MapperConverter.getKotlinClassName(field)}")
+            first = false
+        }
+        builder.appendLine(")")
+        builder.appendLine("} ?: throw NullPointerException(\"Map is null, cannot create object\")")
+        return builder.toString()
+    }
+
+    private fun getFieldsName(element: Element): List<Element> {
+        return element.enclosedElements.filter { it.javaClass.simpleName == "VarSymbol" }
     }
 
     private fun addMappedField(element: Element): String {
@@ -101,7 +130,7 @@ class MapperGenerator private constructor() {
                     builder.append(",\n")
                 }
                 first = false
-                builder.append("$indent\"${el.simpleName}\" to mappedObj.${el.simpleName}")
+                builder.append("$indent\"${el.simpleName}\" to o.${el.simpleName}")
             }
         }
         builder.append("\n")
