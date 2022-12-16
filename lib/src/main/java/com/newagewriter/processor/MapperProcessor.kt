@@ -20,6 +20,7 @@ import javax.tools.StandardLocation
 @SupportedAnnotationTypes("com.newagewriter.processor.mapper.Mapper")
 class MapperProcessor : AbstractProcessor() {
     override fun process(annotations: MutableSet<out TypeElement>?, roundEnv: RoundEnvironment?): Boolean {
+        ProcessorLogger.startLogger(processingEnv)
         processingEnv.messager.printMessage(Diagnostic.Kind.NOTE, "process mappers")
         val mapperList = mutableMapOf<String, String>()
         roundEnv?.getElementsAnnotatedWith(Mapper::class.java)?.forEach { el ->
@@ -41,6 +42,7 @@ class MapperProcessor : AbstractProcessor() {
             .setClassSignature("MapperUtils")
             .setInitBlock("AbstractMapper.Factory = this")
             .overrideMethod("<T> of", listOf("obj: T"), "AbstractMapper<T>?", getOfMethodContent(mapperList))
+            .overrideMethod("<T> forClass", listOf("obj: Class<T>, map: Map<String, Any?>"), "AbstractMapper<T>?", getForClassMethodContent(mapperList))
 
         mapperList.forEach { t, u ->
             mapperUtilsClass.addImport("${u}.$t")
@@ -58,6 +60,7 @@ class MapperProcessor : AbstractProcessor() {
         } catch (ex: Exception) {
             ex.printStackTrace()
         }
+        ProcessorLogger.stop()
         return true
     }
 
@@ -66,6 +69,17 @@ class MapperProcessor : AbstractProcessor() {
         builder.appendLine("when(obj) {")
         mapperList.forEach {
             builder.appendLine("is ${it.key} -> return ${it.key}Mapper(obj) as AbstractMapper<T>")
+        }
+        builder.appendLine("else -> return null")
+        builder.appendLine("}")
+        return builder.toString()
+    }
+
+    private fun getForClassMethodContent(mapperList: Map<String, String>): String {
+        val builder = StringBuffer()
+        builder.appendLine("when(obj.simpleName) {")
+        mapperList.forEach {
+            builder.appendLine("${it.key}::class.java.simpleName -> return ${it.key}Mapper(null, map) as AbstractMapper<T>")
         }
         builder.appendLine("else -> return null")
         builder.appendLine("}")
