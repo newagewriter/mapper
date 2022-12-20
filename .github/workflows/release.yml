@@ -25,12 +25,10 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
-      - name: echo "Build project &#xf121;"
+      - name: echo "Build project &#xf121; and publish"
         uses: gradle/gradle-build-action@v2
-      - run: ./gradlew clean assemble
+      - run: ./gradlew clean assemble publish
       - run: echo "🍏 This job's status is ${{ job.status }}."
-      - name: publish library
-      - run: ./gradlew publish
       - name: upload artifact
         uses: actions/upload-release-asset@v1
         with:
