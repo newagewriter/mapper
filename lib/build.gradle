@@ -2,10 +2,29 @@ plugins {
     id 'java'
     id 'org.jetbrains.kotlin.jvm'
     id "org.jetbrains.kotlin.kapt"
+    id 'maven-publish'
 }
 
-group 'lib'
-version '1.0-SNAPSHOT'
+group 'com.naw.mapper'
+version '0.1.1'
+
+kotlin {
+}
+
+publishing {
+    publications {
+        myLibrary(MavenPublication) {
+            from components.java
+        }
+    }
+
+    repositories {
+        maven {
+            name = 'myRepo'
+            url = layout.buildDirectory.dir("repo")
+        }
+    }
+}
 
 repositories {
     mavenCentral()

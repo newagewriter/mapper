@@ -4,9 +4,6 @@ plugins {
     id("org.jetbrains.kotlin.kapt")
 }
 
-group = "org.example"
-version = "1.0-SNAPSHOT"
-
 repositories {
     mavenCentral()
 }
