@@ -32,20 +32,9 @@ object MapperConverter {
     }
 
     private fun convertComplexObject(field: Element): String {
-        ProcessorLogger.logD("[KB]", "info about field:")
-        ProcessorLogger.logD("[KB]", "simpleName: ${field.simpleName}")
-        ProcessorLogger.logD("[KB]", "kind: ${field.kind}")
-        ProcessorLogger.logD("[KB]", "isClass: ${field.kind.isClass}")
-        ProcessorLogger.logD("[KB]", "enclosedElements: ${field.enclosedElements}")
-        ProcessorLogger.logD("[KB]", "enclosingElements: ${field.enclosingElement}")
-        ProcessorLogger.logD("[KB]", "field: ${field.javaClass.simpleName}")
-        ProcessorLogger.logD("[KB]", "modifiers: ${field.modifiers}")
-        ProcessorLogger.logD("[KB]", "annotation: ${field.annotationMirrors}")
-        ProcessorLogger.logD("[KB]", "typeName: ${field.asType()}")
-        ProcessorLogger.logD("[KB]", "type kind: ${field.asType().kind}")
 
         if(field.asType().kind == TypeKind.DECLARED) {
-            return "toType(${field.asType().toString()}::class.java, map[\"${field.simpleName}\"])"
+            return "toType(${field.asType()}::class.java, map[\"${field.simpleName}\"])"
         }
         throw InvalidClassException("Incorrect kind")
 
