@@ -40,11 +40,10 @@ object MapperExample {
         val t2: Int = t1 as Int
         val car = Car("test", 123456789, 120, 30.5f, Color.GREEN, 5, 'A')
 
-        val carMapper = AbstractMapper.of(car)
+        val carMapper = CarMapper(car)
 
-        carMapper?.let {c ->
-            println("json for car: ${c.toJson()}")
-        } ?: throw NullPointerException("Cannot find mapper for car object")
+        println("json for car: ${carMapper.toJson()}")
+
 
         val carMap = mapOf<String, Any?>(
             "name" to "Ford",
@@ -57,16 +56,16 @@ object MapperExample {
             "isManual" to true
         )
 
-        val carMapper2 = AbstractMapper.toObject(Car::class.java, carMap)
+        val carMapper2 = CarMapper(null, carMap)
 
-        carMapper2?.let {
-            println("Create car from map: ${carMapper2.id} -> ${carMapper2.name}")
-            println("size: ${carMapper2.size}")
-            println("weight: ${carMapper2.weight}")
-            println("color: ${carMapper2.color}")
-            println("version: ${carMapper2.version}")
-            println("isManual: ${carMapper2.isManual}")
-        }
+        val car2 = carMapper2.createMappedObj()
+
+        println("Create car from map: ${car2.id} -> ${car2.name}")
+        println("size: ${car2.size}")
+        println("weight: ${car2.weight}")
+        println("color: ${car2.color}")
+        println("version: ${car2.version}")
+        println("isManual: ${car2.isManual}")
 
         println("check device")
 
