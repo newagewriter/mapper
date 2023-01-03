@@ -4,6 +4,7 @@ import com.newagewriter.example.model.*
 import com.newagewriter.example.model.mapper.CarMapper
 import com.newagewriter.processor.mapper.AbstractMapper
 import java.awt.Color
+import java.util.*
 import javax.swing.DebugGraphics
 
 object MapperExample {
@@ -20,6 +21,24 @@ object MapperExample {
         println("create mapper: $mapper")
         println("toMap: ${mapper?.toMap()}")
         println("toJson: ${mapper?.toJson()}")
+
+        val userMap = mapOf<String, Any?>(
+            "name" to "user2",
+            "id" to 212121,
+            "userInfo" to mapOf<String, Any?>(
+                "avatarUrl" to "https://myavatar.url",
+                "weight" to 50f,
+                "lastUpdate" to Date().time
+            ),
+            "isValidate" to true
+        )
+
+        val user2 = AbstractMapper.toObject(User::class.java, userMap)
+
+        user2?.let {u ->
+            println("user id: ${u.id}")
+            println("user isValidate: ${u.isValidate}")
+        }
 
         val plant = Plant("Sanseviera", PlantType.SUCCULENT, 0.5f, Color.GREEN)
 
@@ -76,6 +95,5 @@ object MapperExample {
         deviceMapper?.let {c ->
             println("json for device: ${c.toJson()}")
         } ?: throw NullPointerException("Cannot find mapper for device object")
-
     }
 }

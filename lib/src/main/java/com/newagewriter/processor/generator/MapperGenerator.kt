@@ -130,7 +130,7 @@ class MapperGenerator private constructor() {
                     builder.append(",\n")
                 }
                 first = false
-                builder.append("$indent\"${el.simpleName}\" to o.${el.simpleName}")
+                builder.append("$indent\"${el.simpleName}\" to getValue(o.${el.simpleName})")
             }
         }
         builder.append("\n")

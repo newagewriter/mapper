@@ -19,8 +19,7 @@ import javax.tools.StandardLocation
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 @SupportedAnnotationTypes("com.newagewriter.processor.mapper.Mapper")
 class MapperProcessor : AbstractProcessor() {
-    override fun process(annotations: MutableSet<out TypeElement>?, roundEnv: RoundEnvironment?): Boolean {
-        ProcessorLogger.startLogger(processingEnv)
+    override fun process(annotations: MutableSet<out TypeElement>?, roundEnv: RoundEnvironment?): Boolean { ProcessorLogger.startLogger(processingEnv)
         processingEnv.messager.printMessage(Diagnostic.Kind.NOTE, "process mappers")
         val mapperList = mutableMapOf<String, String>()
         roundEnv?.getElementsAnnotatedWith(Mapper::class.java)?.forEach { el ->
@@ -51,7 +50,7 @@ class MapperProcessor : AbstractProcessor() {
         try {
             val file = processingEnv.filer.createResource(
                 StandardLocation.SOURCE_OUTPUT,
-                "com.kgb.processor",
+                "com.newagewriter.processor.mapper",
                 "MapperUtils.kt"
             )
             val writer = file.openWriter()
