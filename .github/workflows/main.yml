@@ -25,4 +25,6 @@ jobs:
       - name: echo "Build project &#xf121;"
         uses: gradle/gradle-build-action@v2
       - run: ./gradlew clean assemble
+      - name: echo "Run test"
+        run: ./gradlew lib:test
       - run: echo "🍏 This job's status is ${{ job.status }}."

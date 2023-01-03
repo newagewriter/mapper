@@ -3,7 +3,7 @@ package com.newagewriter.processor.mapper
 import com.newagewriter.processor.converter.MapperConverter
 import java.awt.Color
 import java.io.InvalidClassException
-import java.util.Objects
+import java.util.*
 import kotlin.reflect.KClass
 
 abstract class AbstractMapper<T>(
@@ -41,11 +41,18 @@ abstract class AbstractMapper<T>(
     }
 
     fun<U> toType(type: Class<U>, element: Any?): U {
+        if (element == null) {
+            throw NullPointerException("Object is null")
+        }
         if (type.isEnum) {
             val method = type.getMethod("valueOf", String::class.java)
             return method.invoke(null, element) as U
         }
-        throw InvalidClassException("Cannot cast $element to class ${type.simpleName}")
+        if (element is Map<*, *>) {
+            return toObject(type, element as Map<String, Any?>)
+                ?: throw InvalidClassException("Cannot cast $element to class ${type.simpleName}")
+        }
+        return throw InvalidClassException("Cannot cast $element to class ${type.simpleName}")
     }
 
 
@@ -60,6 +67,7 @@ abstract class AbstractMapper<T>(
             is String -> "\"$value\""
             is Enum<*> -> "\"${value.name}\""
             is Color -> value.rgb
+            is Date -> value.time
             null -> null
             else -> of(value)?.toJson() ?: "\"$value\""
         }
