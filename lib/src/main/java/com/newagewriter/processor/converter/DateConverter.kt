@@ -1,0 +1,13 @@
+package com.newagewriter.processor.converter
+
+import java.util.*
+
+class DateConverter : GenericConverter<Date, Long> {
+    override fun toSimpleValue(entity: Date): Long {
+        return entity.time
+    }
+
+    override fun toEntity(value: Long): Date {
+        return Date(value)
+    }
+}

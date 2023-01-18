@@ -1,15 +1,21 @@
 package com.newagewriter.processor.mapper
 
-import com.newagewriter.processor.converter.MapperConverter
+import com.newagewriter.processor.converter.ColorConverter
+import com.newagewriter.processor.converter.DateConverter
+import com.newagewriter.processor.converter.GenericConverter
 import java.awt.Color
 import java.io.InvalidClassException
 import java.util.*
-import kotlin.reflect.KClass
 
 abstract class AbstractMapper<T>(
     protected var obj: T?,
     protected val objMap: Map<String, Any?>? = null
 ) {
+    private val standardConverters: Map<String, GenericConverter<*, *>> = mapOf(
+        Date::class.java.simpleName to DateConverter(),
+        Color::class.java.simpleName to ColorConverter()
+
+    )
     private var needRefresh = false
 
     constructor(objMap: Map<String, Any?>) : this(null, objMap)
@@ -57,19 +63,19 @@ abstract class AbstractMapper<T>(
 
 
     protected fun getValue(value: Any?): Any? {
-        return when (value) {
-            is Int,
-            is Float,
-            is Double,
-            is Long,
-            is Short,
-            is Boolean -> value
-            is String -> "\"$value\""
-            is Enum<*> -> "\"${value.name}\""
-            is Color -> value.rgb
-            is Date -> value.time
-            null -> null
-            else -> of(value)?.toJson() ?: "\"$value\""
+        return value?.let { v ->
+            getConverter(value.javaClass)?.toSimpleValue(v) ?: when (v) {
+                is Int,
+                is Float,
+                is Double,
+                is Long,
+                is Short,
+                is Boolean -> v
+                is String -> "\"$v\""
+                is Enum<*> -> "\"${v.name}\""
+                null -> null
+                else -> of(value)?.toJson() ?: "\"$value\""
+            }
         }
     }
 
@@ -98,6 +104,10 @@ abstract class AbstractMapper<T>(
         return map.map {
             it.value?.javaClass
         }.toTypedArray()
+    }
+
+    private fun<T> getConverter(classInfo: Class<T>): GenericConverter<T, Any>? {
+        return standardConverters[classInfo.simpleName] as GenericConverter<T, Any>?
     }
 
     companion object {
