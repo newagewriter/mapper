@@ -63,6 +63,14 @@ Mapper class convert object to map/json or create object from given map (json is
     }
    ```
 
+## Add your own converter
+
+In version 0.3 of Mapper library, a Converter patter has been added that allows user 
+to add some new converter or override existing ones. To do that add annotation @Converter to custom converter class witch
+extend GenericConverter interface.
+
+
+
 ## Supported classes
 
 Mapper support all primitive class plus String and Color. Mapper can be nested in other mapper. 

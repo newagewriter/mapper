@@ -1,5 +1,7 @@
-package com.newagewriter.processor.converter
+package com.newagewriter.example
 
+import com.newagewriter.processor.converter.Converter
+import com.newagewriter.processor.converter.GenericConverter
 import java.util.*
 
 @Converter(type = Date::class)
