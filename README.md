@@ -65,7 +65,7 @@ Mapper class convert object to map/json or create object from given map (json is
 
 ## Add your own converter
 
-In version 0.3 and newer of Mapper library, a Converter patter has been added that allows user 
+In version 0.2.0 and newer of Mapper library, a Converter patter has been added that allows user 
 to add some new converter or override existing ones. To do that add annotation @Converter to custom converter class witch
 implements GenericConverter interface. GenericConverter contains two method first method is used to convert value to type: toEntity
 and second is used to converter type to value. Value must be one of primitive types or String.
