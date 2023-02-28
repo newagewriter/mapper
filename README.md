@@ -92,7 +92,6 @@ For example if user want to change the way to save date to map for example as st
     }
 ```
 
-
 ## Supported classes
 
 Mapper support all primitive class plus String and Color. Mapper can be nested in other mapper. 

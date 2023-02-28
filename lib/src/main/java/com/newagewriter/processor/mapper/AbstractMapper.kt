@@ -11,6 +11,7 @@ import kotlin.collections.HashMap
 import kotlin.reflect.KClass
 import kotlin.reflect.KParameter
 
+
 abstract class AbstractMapper<T>(
     protected var obj: T?,
     protected val objMap: Map<String, Any?>? = null
@@ -168,6 +169,5 @@ abstract class AbstractMapper<T>(
             val mapper = Factory.forClass(objClass, map)
             return mapper?.getMappedObj()
         }
-
     }
 }
