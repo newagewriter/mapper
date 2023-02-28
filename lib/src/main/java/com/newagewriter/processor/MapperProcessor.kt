@@ -100,7 +100,7 @@ class MapperProcessor : AbstractProcessor() {
             .addMethod(
                 "initConverters",
                 emptyList(),
-                "Boolean",
+                "Map<String, GenericConverter<*, *>>",
                 getInitConverterMethodContent(elements),
                 annotations = listOf("@JvmStatic")
             )
@@ -126,17 +126,16 @@ class MapperProcessor : AbstractProcessor() {
         result.appendLine("val converters = HashMap<String, GenericConverter<*, *>>()")
         elements.forEach { e ->
             val converterAnnotation: Converter = e.getAnnotation(Converter::class.java)
-            val converterName = e.simpleName
+            val elementPackage = processingEnv.elementUtils.getPackageOf(e)
+            val converterName = "${elementPackage}.${e.simpleName}"
             val reg = Regex("type=(([a-zA-z]+\\.)*)([a-zA-z_0-9]+)").find(converterAnnotation.toString())
             val typeName = reg?.let {
                 val g = it.groupValues
                 g[3]
             } ?: ""
-            ProcessorLogger.logD("[KB]", "element simpleName: ${e.simpleName}")
-            ProcessorLogger.logD("[KB]", "element modifier: ${e.modifiers}")
             result.appendLine("converters.put(\"${typeName}\", ${converterName}())")
         }
-        result.appendLine("return true")
+        result.appendLine("return converters")
         return result.toString()
     }
 }

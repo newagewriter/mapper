@@ -120,13 +120,15 @@ abstract class AbstractMapper<T>(
         init {
             val converter = Class.forName("com.newagewriter.processor.converter.ConverterUtils")
             val initConverters = converter.getMethod("initConverters")
-            initConverters.invoke(null)
             prepareConverters(
                 mapOf(
                     Date::class.java.simpleName to DateConverter(),
                     Color::class.java.simpleName to ColorConverter()
                 )
             )
+
+            prepareConverters( initConverters.invoke(null) as? Map<String, GenericConverter<*, *>>)
+
         }
 
         @JvmStatic
@@ -146,8 +148,11 @@ abstract class AbstractMapper<T>(
         }
 
         @JvmStatic
-        fun prepareConverters(converters: Map<String, GenericConverter<*, *>>) {
-            convertersList.putAll(converters)
+        fun prepareConverters(converters: Map<String, GenericConverter<*, *>>?) {
+            converters?.let {
+                convertersList.putAll(converters)
+            }
+
         }
 
         @JvmStatic
