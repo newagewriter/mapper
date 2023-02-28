@@ -8,6 +8,7 @@ data class MethodInfo(
     val visibility: MethodVisibility = MethodVisibility.PUBLIC,
     val isOverride: Boolean = false,
     val isOpen: Boolean = false,
+    val annotations: List<String> = emptyList()
 
     ) {
 

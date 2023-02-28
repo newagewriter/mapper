@@ -1,9 +1,11 @@
 package com.newagewriter.processor.generator
 
+import com.newagewriter.processor.ProcessorLogger
 import com.newagewriter.processor.converter.MapperConverter
 import java.lang.StringBuilder
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.Element
+import javax.lang.model.element.VariableElement
 import javax.tools.StandardLocation
 
 class MapperGenerator private constructor() {
@@ -101,17 +103,16 @@ class MapperGenerator private constructor() {
         val indent = "    "
         StringBuilder::class.java
         val fields = getFieldsName(element)
+
         builder.appendLine("return  objMap?.let { map -> ")
-        builder.appendLine("${element.simpleName}(")
-        var first = true
+        builder.appendLine("val convertedMap = mutableMapOf<String, Any?>()")
         fields.forEach { field ->
-            if (!first) {
-                builder.append(",\n")
-            }
-            builder.append("${field.simpleName} = ${MapperConverter.getKotlinClassName(field)}")
-            first = false
+            builder.appendLine("if (map.contains(\"${field.simpleName}\")) {")
+            builder.appendLine("${indent}convertedMap[\"${field.simpleName}\"] = ${MapperConverter.getKotlinClassName(field)}")
+            builder.appendLine("}")
         }
-        builder.appendLine(")")
+        builder.appendLine("createFromMap(convertedMap, ${element.simpleName}::class)")
+
         builder.appendLine("} ?: throw NullPointerException(\"Map is null, cannot create object\")")
         return builder.toString()
     }

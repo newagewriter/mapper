@@ -63,6 +63,36 @@ Mapper class convert object to map/json or create object from given map (json is
     }
    ```
 
+## Add your own converter
+
+In version 0.3 and newer of Mapper library, a Converter patter has been added that allows user 
+to add some new converter or override existing ones. To do that add annotation @Converter to custom converter class witch
+implements GenericConverter interface. GenericConverter contains two method first method is used to convert value to type: toEntity
+and second is used to converter type to value. Value must be one of primitive types or String.
+
+For example if user want to change the way to save date to map for example as string (by default converter save date as long):
+
+```kotlin
+    import com.newagewriter.processor.converter.Converter
+    import com.newagewriter.processor.converter.GenericConverter
+    import java.text.DateFormat
+    import java.util.Date
+    import java.util.Locale
+
+    @Converter(type = Date::class)
+    class DateConverter : GenericConverter<Date, String> { 
+       private val dateFormat: DateFormat = DateFormat.getDateInstance(DateFormat.DEFAULT, Locale("pl", "PL"))
+       override fun toSimpleValue(entity: Date): String { 
+          return dateFormat.format(entity) 
+       }
+       
+       override fun toEntity(value: String): Date { 
+          return dateFormat.parse(value) 
+       }
+    }
+```
+
+
 ## Supported classes
 
 Mapper support all primitive class plus String and Color. Mapper can be nested in other mapper. 
