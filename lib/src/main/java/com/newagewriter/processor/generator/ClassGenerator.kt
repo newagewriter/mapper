@@ -8,6 +8,7 @@ class ClassGenerator {
     private var superClass: String? = null
     private var type: ClassType = ClassType.CLASS
     private val interfaces = mutableListOf<String>()
+    private val annotations = mutableListOf<String>()
     private val content: StringBuilder = StringBuilder()
     private val imports = mutableListOf<String>()
     private val methods = mutableListOf<MethodInfo>()
@@ -30,6 +31,10 @@ class ClassGenerator {
         return this
     }
 
+    fun addAnnotation(annotation: String) {
+        annotations.add(annotation)
+    }
+
     fun addInterface(classObj: Class<out Any>): ClassGenerator {
         return addInterface(classObj.`package`.name, classObj.simpleName)
     }
@@ -46,13 +51,13 @@ class ClassGenerator {
         return this
     }
 
-    fun overrideMethod(methodSignature: String, args: List<String>, returnType: String, methodContent: String): ClassGenerator {
-        methods.add(MethodInfo(methodSignature, args, returnType, methodContent, isOverride = true))
+    fun overrideMethod(methodSignature: String, args: List<String>, returnType: String, methodContent: String, annotations: List<String> = emptyList()): ClassGenerator {
+        methods.add(MethodInfo(methodSignature, args, returnType, methodContent, isOverride = true, annotations = annotations))
         return this
     }
 
-    fun addMethod(methodName: String, args: List<String>, returnType: String, methodContent: String): ClassGenerator {
-        methods.add(MethodInfo(methodName, args, returnType, methodContent, isOverride = false))
+    fun addMethod(methodName: String, args: List<String>, returnType: String, methodContent: String, annotations: List<String> = emptyList()): ClassGenerator {
+        methods.add(MethodInfo(methodName, args, returnType, methodContent, isOverride = false, annotations = annotations))
         return this
     }
 
@@ -83,6 +88,9 @@ class ClassGenerator {
         val overrideParam = if (method.isOverride) "override " else ""
         return builder
             .append("\n")
+            .appendLine(if (method.annotations.isNotEmpty()) method.annotations.reduce { acc, ann ->
+                "$acc\n$ann"
+            } else "")
             .appendLine("$indent${method.visibility.value} ${overrideParam}fun ${method.methodName}(${method.args.joinToString(", ")}): ${method.returnType} {")
             .appendLine("$indent${method.methodContent}")
             .appendLine("$indent}")
@@ -104,6 +112,11 @@ class ClassGenerator {
     }
 
     private fun generateClassSignature() {
+        if (annotations.size > 0) {
+            annotations.forEach {
+                content.appendLine(it)
+            }
+        }
         className?.let {
             content.appendLine("${type.value} $it ${generateSuperClassAndInterfaces()}{")
         }

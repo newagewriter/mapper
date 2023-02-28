@@ -4,6 +4,7 @@ import com.newagewriter.processor.ProcessorLogger
 import java.io.InvalidClassException
 import java.lang.StringBuilder
 import java.lang.reflect.InvocationTargetException
+import java.util.Date
 import javax.lang.model.element.Element
 import javax.lang.model.element.ElementKind
 import javax.lang.model.type.TypeKind
@@ -27,6 +28,7 @@ object MapperConverter {
             "java.lang.Character " -> "map[\"${field.simpleName}\"] as Char"
             "java.lang.String" -> "map[\"${field.simpleName}\"] as String"
             "java.awt.Color" -> "java.awt.Color(map[\"${field.simpleName}\"] as Int)"
+            "java.util.Date" -> "java.util.Date(map[\"${field.simpleName}\"] as Long)"
             else -> convertComplexObject(field)
         }
     }
