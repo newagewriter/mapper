@@ -6,7 +6,7 @@ plugins {
 }
 
 group 'com.naw.mapper'
-version '0.2.0'
+version lib_version
 
 kotlin {
 }
@@ -20,8 +20,12 @@ publishing {
 
     repositories {
         maven {
-            name = 'myRepo'
-            url = layout.buildDirectory.dir("repo")
+            name = "GitHubPackages"
+            url = "https://maven.pkg.github.com/newagewriter/mapper"
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
         }
     }
 }
