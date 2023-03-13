@@ -1,0 +1,15 @@
+package ${classPackage}
+
+class ${className}Mapper(mappedObject : ${className}?, map: Map<String, Any?>? = null : AbstractMapper<Car>(mappedObject, map) {
+    public override fun toMap(): Map<String, Any?> {
+        return obj?.let { o ->
+            val result = mapOf<String, Any?>(
+            @foreach($fields, separator=","):
+                "$element" to getValue(o.$element)
+            @end
+            )
+            result
+        } ?: throw NullPointerException("Cannot convert object toMap for null value")
+
+    }
+}
