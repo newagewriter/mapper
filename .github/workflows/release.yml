@@ -45,8 +45,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./lib/build/libs/lib-0.2.1.jar
-          asset_name: lib-0.2.1.jar
+          asset_path: ./lib/build/libs/lib-0.2.2.jar
+          asset_name: lib-0.2.2.jar
           asset_content_type: application/java-archive
       - name: Publish package
         uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
