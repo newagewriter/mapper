@@ -13,7 +13,7 @@ kotlin {
 
 publishing {
     publications {
-        myLibrary(MavenPublication) {
+        mapper(MavenPublication) {
             from components.java
         }
     }
