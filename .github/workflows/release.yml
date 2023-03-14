@@ -27,7 +27,6 @@ jobs:
           java-version: 1.8
       - name: echo "Build project &#xf121; and publish"
         uses: gradle/gradle-build-action@v2
-      - run: ./gradlew clean assemble publish
       - run: echo "🍏 This job's status is ${{ job.status }}."
       - name: Create Release
         id: create_release
