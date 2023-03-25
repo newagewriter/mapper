@@ -49,16 +49,16 @@ abstract class AbstractMapper<T>(
 
     protected fun getValue(value: Any?): Any? {
         return value?.let { v ->
-            getConverter(value.javaClass)?.toSimpleValue(v) ?: when (v) {
+            getConverter(v.javaClass)?.toSimpleValue(v) ?: when (v) {
                 is Int,
                 is Float,
                 is Double,
                 is Long,
                 is Short,
                 is Boolean -> v
-                is String -> "\"$v\""
-                is Enum<*> -> "\"${v.name}\""
-                else -> of(value)?.toJson() ?: "\"$value\""
+                is String -> "$v"
+                is Enum<*> -> v.name
+                else -> of(v)?.toJson() ?: "$v"
             }
         }
     }
@@ -97,9 +97,7 @@ abstract class AbstractMapper<T>(
     }
 
     protected fun createFromMap(map: Map<String, Any?>, clazz: KClass<T>): T {
-
         clazz.constructors.forEach {c ->
-            println("check constructors: ${c.name}")
             val params = mutableMapOf<String, KParameter>()
             c.parameters.forEach { p ->
                 if (!p.isOptional || map.containsKey(p.name)) {
@@ -107,12 +105,10 @@ abstract class AbstractMapper<T>(
                 }
             }
             if (map.keys.containsAll(params.keys) && map.keys.size == params.size ) {
-                val args = map.mapKeys { p ->
-                    params[p.key]!!
-                }
                 try {
-                    println("args: $args")
-                    return c.callBy(args)
+                    return c.callBy(map.mapKeys { p ->
+                        params[p.key]!!
+                    })
                 } catch (e: IllegalArgumentException) {
                     println("exception: ${e.message}")
                     e.printStackTrace()
