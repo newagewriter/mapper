@@ -28,7 +28,7 @@ object MapperExample {
             "userInfo" to mapOf<String, Any?>(
                 "avatarUrl" to "https://myavatar.url",
                 "weight" to 50f,
-                "lastUpdate" to Date().time
+                "lastUpdate" to DateConverter().toSimpleValue(Date())
             ),
             "isValidate" to true
         )

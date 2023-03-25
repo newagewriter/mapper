@@ -1,0 +1,29 @@
+package ${classPackage}.mapper
+
+import com.newagewriter.processor.mapper.AbstractMapper
+import ${classPackage}.${className}
+
+class ${className}Mapper(mappedObject : ${className}?, map: Map<String, Any?>? = null) : AbstractMapper<${className}>(mappedObject, map) {
+    public override fun toMap(): Map<String, Any?> {
+        return obj?.let { o ->
+            val result = mapOf<String, Any?>(
+            @foreach($fields, separator=","):
+                "$element" to getValue(o.$element)
+            @end
+            )
+            result
+        } ?: throw NullPointerException("Cannot convert object toMap for null value")
+    }
+
+    public override fun createMappedObj(): ${className} {
+        return  objMap?.let { map ->
+            val convertedMap = mutableMapOf<String, Any?>()
+            @foreach($map as key -> value):
+            if (map.contains("$key")) {
+                convertedMap["$key"] = toType($value::class.java, map["$key"])
+            }
+            @end
+            createFromMap(convertedMap, ${className}::class)
+        } ?: throw NullPointerException("Map is null, cannot create object")
+    }
+}

@@ -10,6 +10,7 @@ import java.util.*
 import kotlin.collections.HashMap
 import kotlin.reflect.KClass
 import kotlin.reflect.KParameter
+import kotlin.reflect.jvm.jvmErasure
 
 
 abstract class AbstractMapper<T>(
@@ -105,14 +106,20 @@ abstract class AbstractMapper<T>(
                     params[p.name ?: "<UNKNOWN>"] = p
                 }
             }
-            if (map.keys.containsAll(params.keys) && map.keys.size == params.size) {
+            if (map.keys.containsAll(params.keys) && map.keys.size == params.size ) {
                 val args = map.mapKeys { p ->
                     params[p.key]!!
                 }
-                return c.callBy(args)
+                try {
+                    println("args: $args")
+                    return c.callBy(args)
+                } catch (e: IllegalArgumentException) {
+                    println("exception: ${e.message}")
+                    e.printStackTrace()
+                }
             }
         }
-        throw InvocationTargetException(Exception("Cannot find constructor for given map"))
+        throw InvocationTargetException(Exception("Cannot find constructor for given map: $map"))
     }
 
     companion object {
@@ -137,6 +144,11 @@ abstract class AbstractMapper<T>(
         fun<U> toType(type: Class<U>, element: Any?): U where U : Any {
             return if (element == null) {
                 throw NullPointerException("Object is null")
+            } else if (isPrimitive(type)) {
+                castPrimitiveTo(element, type)
+            } else if (convertersList.containsKey(type.simpleName)) {
+                val value: GenericConverter<U, Any> = convertersList[type.simpleName] as GenericConverter<U, Any>
+                value.toEntity(element)
             } else if (type.isEnum) {
                 val method = type.getMethod("valueOf", String::class.java)
                 method.invoke(null, element) as U
@@ -168,6 +180,34 @@ abstract class AbstractMapper<T>(
             Class.forName("com.newagewriter.processor.mapper.MapperUtils")
             val mapper = Factory.forClass(objClass, map)
             return mapper?.getMappedObj()
+        }
+
+        fun getConverterForType(type: Class<*>): String? {
+            return convertersList[type.simpleName]?.javaClass?.toGenericString()
+        }
+
+        @JvmStatic
+        protected fun isPrimitive(type: Class<*>): Boolean {
+            return when(type.simpleName) {
+                String::class.java.simpleName,
+                Char::class.java.simpleName,
+                Boolean::class.java.simpleName,
+                Byte::class.java.simpleName,
+                Short::class.java.simpleName,
+                Int::class.java.simpleName,
+                Long::class.java.simpleName,
+                Float::class.java.simpleName,
+                Double::class.java.simpleName -> true
+                else -> false
+            }
+        }
+
+        private fun<U> castPrimitiveTo(element: Any, type: Class<U>): U {
+            return when(type.simpleName) {
+                Byte::class.java.simpleName -> (element as Int).toByte()
+                Short::class.java.simpleName -> (element as Int).toShort()
+                else -> element
+            } as U
         }
     }
 }
