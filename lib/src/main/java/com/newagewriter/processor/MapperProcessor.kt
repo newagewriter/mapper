@@ -7,6 +7,7 @@ import com.newagewriter.processor.generator.MapperGenerator
 import com.newagewriter.processor.mapper.AbstractMapper
 import com.newagewriter.processor.mapper.Mapper
 import com.newagewriter.processor.mapper.MapperFactory
+import com.newagewriter.template.TemplateLoader
 import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.RoundEnvironment
 import javax.annotation.processing.SupportedAnnotationTypes
@@ -93,6 +94,24 @@ class MapperProcessor : AbstractProcessor() {
     }
 
     private fun generateConverterList(elements: Set<Element>) {
+        val map = mutableMapOf<String, String>()
+        elements.forEach { e ->
+            val converterAnnotation: Converter = e.getAnnotation(Converter::class.java)
+            val elementPackage = processingEnv.elementUtils.getPackageOf(e)
+            val converterName = "${elementPackage}.${e.simpleName}"
+            val reg = Regex("type=(([a-zA-z]+\\.)*)([a-zA-z_0-9]+)").find(converterAnnotation.toString())
+            val typeName = reg?.let {
+                val g = it.groupValues
+                if (g[0].endsWith(".class")) {
+                    g[2].replace(".", "")
+                } else {
+                    g[3]
+                }
+            } ?: ""
+            map[typeName] = converterName
+        }
+        val converterTemplate = TemplateLoader.load("ConverterUtils")
+        converterTemplate.addVariable("map", map)
         val converterModule = ClassGenerator()
             .setClassType(ClassGenerator.ClassType.OBJECT)
             .setPackage("com.newagewriter.processor.converter")
@@ -113,7 +132,7 @@ class MapperProcessor : AbstractProcessor() {
                 "ConverterUtils.kt"
             )
             val writer = file.openWriter()
-            writer.write(converterModule.generate().toString())
+            writer.write(converterTemplate.compile())
             writer.close()
         } catch (ex: Exception) {
             ex.printStackTrace()
@@ -131,7 +150,11 @@ class MapperProcessor : AbstractProcessor() {
             val reg = Regex("type=(([a-zA-z]+\\.)*)([a-zA-z_0-9]+)").find(converterAnnotation.toString())
             val typeName = reg?.let {
                 val g = it.groupValues
-                g[3]
+                if (g[0].endsWith(".class")) {
+                    g[2].replace(".", "")
+                } else {
+                    g[3]
+                }
             } ?: ""
             result.appendLine("converters.put(\"${typeName}\", ${converterName}())")
         }
