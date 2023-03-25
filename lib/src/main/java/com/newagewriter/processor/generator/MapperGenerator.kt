@@ -1,11 +1,10 @@
 package com.newagewriter.processor.generator
 
-import com.newagewriter.processor.ProcessorLogger
 import com.newagewriter.processor.converter.MapperConverter
+import com.newagewriter.template.TemplateLoader
 import java.lang.StringBuilder
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.Element
-import javax.lang.model.element.VariableElement
 import javax.tools.StandardLocation
 
 class MapperGenerator private constructor() {
@@ -56,16 +55,26 @@ class MapperGenerator private constructor() {
     fun generateFile(): String {
         val packageName = processingEnv.elementUtils.getPackageOf(el)
         val mapperName = el.simpleName
-        content.append(ClassGenerator()
-            .setClassSignature("${mapperName}Mapper(mappedObject : ${el.simpleName}?, map: Map<String, Any?>? = null)")
-            .setPackage("${packageName.qualifiedName}.mapper")
-            .addImport("com.newagewriter.processor.mapper.AbstractMapper")
-            .addImport("${packageName.qualifiedName}.${el.simpleName}")
-            .setSuperClassSignature("", "AbstractMapper<${mapperName}>(mappedObject, map)")
-            .overrideMethod("toMap", emptyList(), "Map<String, Any?>", generateToMapMethodContent(el))
-            .overrideMethod("createMappedObj", emptyList(), el.simpleName.toString(), generateFromMapMethodContent(el))
-            .generate()
-        )
+
+//        content.append(ClassGenerator()
+//            .setClassSignature("${mapperName}Mapper(mappedObject : ${el.simpleName}?, map: Map<String, Any?>? = null)")
+//            .setPackage("${packageName.qualifiedName}.mapper")
+//            .addImport("com.newagewriter.processor.mapper.AbstractMapper")
+//            .addImport("${packageName.qualifiedName}.${el.simpleName}")
+//            .setSuperClassSignature("", "AbstractMapper<${mapperName}>(mappedObject, map)")
+//            .overrideMethod("toMap", emptyList(), "Map<String, Any?>", generateToMapMethodContent(el))
+//            .overrideMethod("createMappedObj", emptyList(), el.simpleName.toString(), generateFromMapMethodContent(el))
+//            .generate()
+//        )
+        val fieldsName = getFields(el).map {e -> e.simpleName.toString()}
+        val fields = getFields(el)
+            .map {e -> e.simpleName to MapperConverter.getKotlinTypeForElement(e)}.toMap()
+        val template = TemplateLoader.load("MapperTemplate")
+            .addVariable("className", el.simpleName)
+            .addVariable("classPackage",packageName.qualifiedName)
+            .addVariable("fields", fieldsName)
+            .addVariable("map", fields)
+
 
         try {
             val file = processingEnv.filer.createResource(
@@ -74,7 +83,8 @@ class MapperGenerator private constructor() {
                 "${mapperName}Mapper.kt"
             );
             val writer = file.openWriter()
-            writer.write(content.toString())
+            writer.write(template.compile())
+//            writer.write(content.toString())
             writer.close()
         } catch (ex: Exception) {
             ex.printStackTrace()
@@ -102,7 +112,7 @@ class MapperGenerator private constructor() {
         val builder = StringBuilder()
         val indent = "    "
         StringBuilder::class.java
-        val fields = getFieldsName(element)
+        val fields = getFields(element)
 
         builder.appendLine("return  objMap?.let { map -> ")
         builder.appendLine("val convertedMap = mutableMapOf<String, Any?>()")
@@ -117,7 +127,7 @@ class MapperGenerator private constructor() {
         return builder.toString()
     }
 
-    private fun getFieldsName(element: Element): List<Element> {
+    private fun getFields(element: Element): List<Element> {
         return element.enclosedElements.filter { it.javaClass.simpleName == "VarSymbol" }
     }
 

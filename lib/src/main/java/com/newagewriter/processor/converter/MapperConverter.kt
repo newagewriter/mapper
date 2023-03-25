@@ -1,6 +1,8 @@
 package com.newagewriter.processor.converter
 
 import com.newagewriter.processor.ProcessorLogger
+import com.newagewriter.processor.mapper.AbstractMapper
+import java.awt.Color
 import java.io.InvalidClassException
 import java.lang.StringBuilder
 import java.lang.reflect.InvocationTargetException
@@ -30,6 +32,27 @@ object MapperConverter {
             "java.awt.Color" -> "java.awt.Color(map[\"${field.simpleName}\"] as Int)"
             "java.util.Date" -> "java.util.Date(map[\"${field.simpleName}\"] as Long)"
             else -> convertComplexObject(field)
+        }
+    }
+
+    fun getKotlinTypeForElement(field: Element): String {
+        return when(field.asType().toString()) {
+            "int",
+            "java.lang.Integer" -> "Int"
+            "byte",
+            "java.lang.Byte" -> "Byte"
+            "float",
+            "java.lang.Float" -> "Float"
+            "boolean",
+            "java.lang.Boolean" -> "Boolean"
+            "short",
+            "java.lang.Short" -> "Short"
+            "long",
+            "java.lang.Long" -> "Long"
+            "char",
+            "java.lang.Character " -> "Char"
+            "java.lang.String" -> "String"
+            else -> "${field.asType()}"
         }
     }
 
