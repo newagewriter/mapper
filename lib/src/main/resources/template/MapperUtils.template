@@ -21,12 +21,9 @@ object MapperUtils : MapperFactory {
 
     public override fun <T> forClass(obj: Class<T>, map: Map<String, Any?>): AbstractMapper<T>? where T : Any {
         when(obj.simpleName) {
-            BrokenUser::class.java.simpleName -> return BrokenUserMapper(null, map) as AbstractMapper<T>
-            Car::class.java.simpleName -> return CarMapper(null, map) as AbstractMapper<T>
-            Device::class.java.simpleName -> return DeviceMapper(null, map) as AbstractMapper<T>
-            Plant::class.java.simpleName -> return PlantMapper(null, map) as AbstractMapper<T>
-            User::class.java.simpleName -> return UserMapper(null, map) as AbstractMapper<T>
-            UserInfo::class.java.simpleName -> return UserInfoMapper(null, map) as AbstractMapper<T>
+        @foreach($types):
+            $element::class.java.simpleName -> return ${element}Mapper(null, map) as AbstractMapper<T>
+        @end
             else -> return null
         }
     }
