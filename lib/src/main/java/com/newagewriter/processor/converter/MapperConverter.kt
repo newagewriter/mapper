@@ -1,19 +1,12 @@
 package com.newagewriter.processor.converter
 
-import com.newagewriter.processor.ProcessorLogger
-import com.newagewriter.processor.mapper.AbstractMapper
-import java.awt.Color
 import java.io.InvalidClassException
-import java.lang.StringBuilder
-import java.lang.reflect.InvocationTargetException
-import java.util.Date
 import javax.lang.model.element.Element
-import javax.lang.model.element.ElementKind
 import javax.lang.model.type.TypeKind
 
 object MapperConverter {
     fun getKotlinClassName(field: Element): String {
-        return when(field.asType().toString()) {
+        return when (field.asType().toString()) {
             "int",
             "java.lang.Integer" -> "map[\"${field.simpleName}\"] as Int"
             "byte",
@@ -36,7 +29,7 @@ object MapperConverter {
     }
 
     fun getKotlinTypeForElement(field: Element): String {
-        return when(field.asType().toString()) {
+        return when (field.asType().toString()) {
             "int",
             "java.lang.Integer" -> "Int"
             "byte",
@@ -57,18 +50,16 @@ object MapperConverter {
     }
 
     private fun convertComplexObject(field: Element): String {
-
-        if(field.asType().kind == TypeKind.DECLARED) {
+        if (field.asType().kind == TypeKind.DECLARED) {
             return "toType(${field.asType()}::class.java, map[\"${field.simpleName}\"])"
         }
         throw InvalidClassException("Incorrect kind")
-
     }
 
     private fun arrayToString(someArray: Array<out Any>): String {
         val result = StringBuilder()
         result.append("[")
-        someArray.forEach {el ->
+        someArray.forEach { el ->
             result.append("$el ")
         }
         result.append("]")

@@ -10,8 +10,6 @@ import java.util.*
 import kotlin.collections.HashMap
 import kotlin.reflect.KClass
 import kotlin.reflect.KParameter
-import kotlin.reflect.jvm.jvmErasure
-
 
 abstract class AbstractMapper<T>(
     protected var obj: T?,
@@ -97,18 +95,20 @@ abstract class AbstractMapper<T>(
     }
 
     protected fun createFromMap(map: Map<String, Any?>, clazz: KClass<T>): T {
-        clazz.constructors.forEach {c ->
+        clazz.constructors.forEach { c ->
             val params = mutableMapOf<String, KParameter>()
             c.parameters.forEach { p ->
                 if (!p.isOptional || map.containsKey(p.name)) {
                     params[p.name ?: "<UNKNOWN>"] = p
                 }
             }
-            if (map.keys.containsAll(params.keys) && map.keys.size == params.size ) {
+            if (map.keys.containsAll(params.keys) && map.keys.size == params.size) {
                 try {
-                    return c.callBy(map.mapKeys { p ->
-                        params[p.key]!!
-                    })
+                    return c.callBy(
+                        map.mapKeys { p ->
+                            params[p.key]!!
+                        }
+                    )
                 } catch (e: IllegalArgumentException) {
                     println("exception: ${e.message}")
                     e.printStackTrace()
@@ -131,8 +131,7 @@ abstract class AbstractMapper<T>(
                 )
             )
 
-            prepareConverters( initConverters.invoke(null) as? Map<String, GenericConverter<*, *>>)
-
+            prepareConverters(initConverters.invoke(null) as? Map<String, GenericConverter<*, *>>)
         }
 
         @JvmStatic
@@ -161,7 +160,6 @@ abstract class AbstractMapper<T>(
             converters?.let {
                 convertersList.putAll(converters)
             }
-
         }
 
         @JvmStatic
@@ -184,7 +182,7 @@ abstract class AbstractMapper<T>(
 
         @JvmStatic
         protected fun isPrimitive(type: Class<*>): Boolean {
-            return when(type.simpleName) {
+            return when (type.simpleName) {
                 String::class.java.simpleName,
                 Char::class.java.simpleName,
                 Boolean::class.java.simpleName,
@@ -199,7 +197,7 @@ abstract class AbstractMapper<T>(
         }
 
         private fun<U> castPrimitiveTo(element: Any, type: Class<U>): U {
-            return when(type.simpleName) {
+            return when (type.simpleName) {
                 Byte::class.java.simpleName -> (element as Int).toByte()
                 Short::class.java.simpleName -> (element as Int).toShort()
                 else -> element

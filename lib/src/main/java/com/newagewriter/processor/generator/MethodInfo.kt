@@ -9,14 +9,14 @@ data class MethodInfo(
     val isOverride: Boolean = false,
     val isOpen: Boolean = false,
     val annotations: List<String> = emptyList()
-
-    ) {
+) {
 
     enum class MethodVisibility(val value: String) {
         PUBLIC("public"),
         PRIVATE("private"),
         PROTECTED("protected"),
-        //For java class only
-        PACKAGE("package");
+
+        // For java class only
+        PACKAGE("package")
     }
 }

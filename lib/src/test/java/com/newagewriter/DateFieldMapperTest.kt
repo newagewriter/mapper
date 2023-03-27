@@ -5,7 +5,6 @@ import com.newagewriter.processor.mapper.AbstractMapper
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import java.util.*
-import java.util.regex.Pattern
 
 class DateFieldMapperTest {
 
@@ -42,6 +41,7 @@ class DateFieldMapperTest {
         Assertions.assertEquals(startTime, model?.startDate?.time, "Incorect value for startTime")
         Assertions.assertEquals(endTime, model?.endDate?.time, "Incorect value for endTime")
     }
+
     @Test
     fun testConvertObjectToJson() {
         val myDate = Date()

@@ -15,10 +15,8 @@ import javax.annotation.processing.SupportedSourceVersion
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
-import javax.lang.model.type.MirroredTypeException
 import javax.tools.Diagnostic
 import javax.tools.StandardLocation
-
 
 @AutoService(Process::class)
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
@@ -42,6 +40,10 @@ class MapperProcessor : AbstractProcessor() {
                     .generateFile()
             }
             roundEnv?.getElementsAnnotatedWith(Converter::class.java)?.let { generateConverterList(it) }
+            val mapperUtilsTemplate = TemplateLoader.load("MapperUtils")
+            mapperUtilsTemplate
+                .addVariable("types", mapperList.keys)
+                .addVariable("mapperList", mapperList)
             val mapperUtilsClass = ClassGenerator()
                 .setClassType(ClassGenerator.ClassType.OBJECT)
                 .setPackage("com.newagewriter.processor.mapper")
@@ -52,8 +54,8 @@ class MapperProcessor : AbstractProcessor() {
                 .overrideMethod("<T> forClass", listOf("obj: Class<T>, map: Map<String, Any?>"), "AbstractMapper<T>? where T : Any", getForClassMethodContent(mapperList))
 
             mapperList.forEach { t, u ->
-                mapperUtilsClass.addImport("${u}.$t")
-                mapperUtilsClass.addImport("${u}.mapper.${t}Mapper")
+                mapperUtilsClass.addImport("$u.$t")
+                mapperUtilsClass.addImport("$u.mapper.${t}Mapper")
             }
             val file = processingEnv.filer.createResource(
                 StandardLocation.SOURCE_OUTPUT,
@@ -61,7 +63,7 @@ class MapperProcessor : AbstractProcessor() {
                 "MapperUtils.kt"
             )
             val writer = file.openWriter()
-            writer.write(mapperUtilsClass.generate().toString())
+            writer.write(mapperUtilsTemplate.compile())
             writer.close()
         } catch (ex: Exception) {
             ex.printStackTrace()
@@ -98,7 +100,7 @@ class MapperProcessor : AbstractProcessor() {
         elements.forEach { e ->
             val converterAnnotation: Converter = e.getAnnotation(Converter::class.java)
             val elementPackage = processingEnv.elementUtils.getPackageOf(e)
-            val converterName = "${elementPackage}.${e.simpleName}"
+            val converterName = "$elementPackage.${e.simpleName}"
             val reg = Regex("type=(([a-zA-z]+\\.)*)([a-zA-z_0-9]+)").find(converterAnnotation.toString())
             val typeName = reg?.let {
                 val g = it.groupValues
@@ -112,18 +114,6 @@ class MapperProcessor : AbstractProcessor() {
         }
         val converterTemplate = TemplateLoader.load("ConverterUtils")
         converterTemplate.addVariable("map", map)
-        val converterModule = ClassGenerator()
-            .setClassType(ClassGenerator.ClassType.OBJECT)
-            .setPackage("com.newagewriter.processor.converter")
-            .setClassSignature("ConverterUtils")
-            .addMethod(
-                "initConverters",
-                emptyList(),
-                "Map<String, GenericConverter<*, *>>",
-                getInitConverterMethodContent(elements),
-                annotations = listOf("@JvmStatic")
-            )
-//            .addImport("com.newagewriter.processor.converter")
 
         try {
             val file = processingEnv.filer.createResource(
@@ -138,27 +128,5 @@ class MapperProcessor : AbstractProcessor() {
             ex.printStackTrace()
         }
         ProcessorLogger.stop()
-    }
-
-    private fun getInitConverterMethodContent(elements: Set<Element>): String {
-        val result = StringBuilder()
-        result.appendLine("val converters = HashMap<String, GenericConverter<*, *>>()")
-        elements.forEach { e ->
-            val converterAnnotation: Converter = e.getAnnotation(Converter::class.java)
-            val elementPackage = processingEnv.elementUtils.getPackageOf(e)
-            val converterName = "${elementPackage}.${e.simpleName}"
-            val reg = Regex("type=(([a-zA-z]+\\.)*)([a-zA-z_0-9]+)").find(converterAnnotation.toString())
-            val typeName = reg?.let {
-                val g = it.groupValues
-                if (g[0].endsWith(".class")) {
-                    g[2].replace(".", "")
-                } else {
-                    g[3]
-                }
-            } ?: ""
-            result.appendLine("converters.put(\"${typeName}\", ${converterName}())")
-        }
-        result.appendLine("return converters")
-        return result.toString()
     }
 }

@@ -4,7 +4,7 @@ import com.newagewriter.processor.mapper.Mapper
 
 @Mapper
 data class ClassWithDefaultBoolean(
-  val id: String,
-  val name: String,
-  val isActive: Boolean = true
+    val id: String,
+    val name: String,
+    val isActive: Boolean = true
 )
