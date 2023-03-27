@@ -18,7 +18,6 @@ import javax.lang.model.element.TypeElement
 import javax.tools.Diagnostic
 import javax.tools.StandardLocation
 
-
 @AutoService(Process::class)
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 @SupportedAnnotationTypes(value = ["com.newagewriter.processor.mapper.Mapper", "com.newagewriter.processor.converter.Converter"])
@@ -55,8 +54,8 @@ class MapperProcessor : AbstractProcessor() {
                 .overrideMethod("<T> forClass", listOf("obj: Class<T>, map: Map<String, Any?>"), "AbstractMapper<T>? where T : Any", getForClassMethodContent(mapperList))
 
             mapperList.forEach { t, u ->
-                mapperUtilsClass.addImport("${u}.$t")
-                mapperUtilsClass.addImport("${u}.mapper.${t}Mapper")
+                mapperUtilsClass.addImport("$u.$t")
+                mapperUtilsClass.addImport("$u.mapper.${t}Mapper")
             }
             val file = processingEnv.filer.createResource(
                 StandardLocation.SOURCE_OUTPUT,
@@ -101,7 +100,7 @@ class MapperProcessor : AbstractProcessor() {
         elements.forEach { e ->
             val converterAnnotation: Converter = e.getAnnotation(Converter::class.java)
             val elementPackage = processingEnv.elementUtils.getPackageOf(e)
-            val converterName = "${elementPackage}.${e.simpleName}"
+            val converterName = "$elementPackage.${e.simpleName}"
             val reg = Regex("type=(([a-zA-z]+\\.)*)([a-zA-z_0-9]+)").find(converterAnnotation.toString())
             val typeName = reg?.let {
                 val g = it.groupValues

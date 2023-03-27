@@ -19,7 +19,7 @@ class TemplateClass(
                 is Collection<*> -> {
                     val pattern = Regex("@foreach\\(\\\$$key(, separator=\"([^\"]+)\")?\\):([^@]+)@end")
                     var matches = pattern.find(result)
-                    while(matches != null) {
+                    while (matches != null) {
                         val mapBlock = StringBuilder()
                         value.forEach { v ->
                             val separator = matches?.groupValues?.get(2) ?: ""
@@ -28,11 +28,9 @@ class TemplateClass(
 
                             mapBlock.append("$statement$separator")
                         }
-        //                    println(mapBlock.toString())
                         result = result.replaceFirst(pattern, mapBlock.toString())
                         matches = matches.next()
                     }
-
                 }
 
                 is Map<*, *> -> {
@@ -45,7 +43,7 @@ class TemplateClass(
                             println("group ${index++}: ${it?.value}")
                         }
                     }
-                    while(matches != null) {
+                    while (matches != null) {
                         val mapBlock = StringBuilder()
                         value.forEach { k, v ->
                             val keyName = matches?.groupValues?.get(1)
@@ -57,16 +55,13 @@ class TemplateClass(
 
                             mapBlock.append("$statement$separator")
                         }
-//                        println(mapBlock.toString())
                         result = result.replaceFirst(pattern, mapBlock.toString())
                         matches = matches.next()
                     }
-
                 }
 
                 else -> {
                     val pattern = Regex("\\\$\\{$key}")
-//                    println("regex pattern: ${pattern.pattern}")
                     result = result.replace(pattern, value.toString())
                 }
             }

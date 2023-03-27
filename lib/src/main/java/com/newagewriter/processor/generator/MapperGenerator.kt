@@ -56,22 +56,21 @@ class MapperGenerator private constructor() {
         val packageName = processingEnv.elementUtils.getPackageOf(el)
         val mapperName = el.simpleName
 
-        val fieldsName = getFields(el).map {e -> e.simpleName.toString()}
+        val fieldsName = getFields(el).map { e -> e.simpleName.toString() }
         val fields = getFields(el)
-            .map {e -> e.simpleName to MapperConverter.getKotlinTypeForElement(e)}.toMap()
+            .map { e -> e.simpleName to MapperConverter.getKotlinTypeForElement(e) }.toMap()
         val template = TemplateLoader.load("MapperTemplate")
             .addVariable("className", el.simpleName)
             .addVariable("classPackage", "${packageName.qualifiedName}")
             .addVariable("fields", fieldsName)
             .addVariable("map", fields)
 
-
         try {
             val file = processingEnv.filer.createResource(
                 sourceOutput,
                 "$moduleAndPkg",
                 "${mapperName}Mapper.kt"
-            );
+            )
             val writer = file.openWriter()
             writer.write(template.compile())
 //            writer.write(content.toString())
@@ -83,22 +82,19 @@ class MapperGenerator private constructor() {
     }
 
     private fun generateToMapMethodContent(element: Element): String {
-
         val builder = StringBuilder()
         val indent = "    "
         return builder
             .appendLine("return obj?.let { o ->")
             .append("${indent}val result = mapOf<String, Any?>(\n")
             .append("$indent    ${addMappedField(element)}")
-            .append("${indent})\n")
-//            .append(prepareMappedField(element))
+            .append("$indent)\n")
             .append("${indent}result\n")
             .append("} ?: throw NullPointerException(\"Cannot convert object toMap for null value\")\n")
             .toString()
     }
 
     private fun generateFromMapMethodContent(element: Element): String {
-
         val builder = StringBuilder()
         val indent = "    "
         StringBuilder::class.java

@@ -26,8 +26,9 @@ class ClassGenerator {
 
     fun addInterface(packageName: String, interfaceName: String): ClassGenerator {
         interfaces.add(interfaceName)
-        if (this.packageName != packageName && imports.contains(packageName))
+        if (this.packageName != packageName && imports.contains(packageName)) {
             imports.add(packageName)
+        }
         return this
     }
 
@@ -41,8 +42,9 @@ class ClassGenerator {
 
     fun setSuperClassSignature(packageName: String, superClassName: String): ClassGenerator {
         superClass = superClassName
-        if (this.packageName != packageName && imports.contains(packageName))
+        if (this.packageName != packageName && imports.contains(packageName)) {
             imports.add(packageName)
+        }
         return this
     }
 
@@ -88,9 +90,7 @@ class ClassGenerator {
         val overrideParam = if (method.isOverride) "override " else ""
         return builder
             .append("\n")
-            .appendLine(if (method.annotations.isNotEmpty()) method.annotations.reduce { acc, ann ->
-                "$acc\n$ann"
-            } else "")
+            .appendLine(method.annotations.reduce { acc, ann -> "$acc\n$ann" })
             .appendLine("$indent${method.visibility.value} ${overrideParam}fun ${method.methodName}(${method.args.joinToString(", ")}): ${method.returnType} {")
             .appendLine("$indent${method.methodContent}")
             .appendLine("$indent}")
@@ -122,7 +122,7 @@ class ClassGenerator {
         }
     }
 
-    private fun generateSuperClassAndInterfaces(): String  {
+    private fun generateSuperClassAndInterfaces(): String {
         val result = StringBuilder()
         if (superClass != null) {
             result.append(": $superClass")
