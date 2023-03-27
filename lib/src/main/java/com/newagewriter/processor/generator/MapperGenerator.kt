@@ -56,22 +56,12 @@ class MapperGenerator private constructor() {
         val packageName = processingEnv.elementUtils.getPackageOf(el)
         val mapperName = el.simpleName
 
-//        content.append(ClassGenerator()
-//            .setClassSignature("${mapperName}Mapper(mappedObject : ${el.simpleName}?, map: Map<String, Any?>? = null)")
-//            .setPackage("${packageName.qualifiedName}.mapper")
-//            .addImport("com.newagewriter.processor.mapper.AbstractMapper")
-//            .addImport("${packageName.qualifiedName}.${el.simpleName}")
-//            .setSuperClassSignature("", "AbstractMapper<${mapperName}>(mappedObject, map)")
-//            .overrideMethod("toMap", emptyList(), "Map<String, Any?>", generateToMapMethodContent(el))
-//            .overrideMethod("createMappedObj", emptyList(), el.simpleName.toString(), generateFromMapMethodContent(el))
-//            .generate()
-//        )
         val fieldsName = getFields(el).map {e -> e.simpleName.toString()}
         val fields = getFields(el)
             .map {e -> e.simpleName to MapperConverter.getKotlinTypeForElement(e)}.toMap()
         val template = TemplateLoader.load("MapperTemplate")
             .addVariable("className", el.simpleName)
-            .addVariable("classPackage",packageName.qualifiedName)
+            .addVariable("classPackage", "${packageName.qualifiedName}")
             .addVariable("fields", fieldsName)
             .addVariable("map", fields)
 

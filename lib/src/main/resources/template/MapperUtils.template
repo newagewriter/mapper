@@ -1,0 +1,33 @@
+package com.newagewriter.processor.mapper
+@foreach($mapperList as key -> value):
+import ${value}.${key}
+import ${value}.mapper.${key}Mapper
+@end
+
+object MapperUtils : MapperFactory {
+
+    init {
+        AbstractMapper.Factory = this
+    }
+    public override fun <T> of(obj: T): AbstractMapper<T>? where T : Any {
+        when(obj) {
+        @foreach($types):
+            is $element -> return ${element}Mapper(obj) as AbstractMapper<T>
+        @end
+            else -> return null
+        }
+
+    }
+
+    public override fun <T> forClass(obj: Class<T>, map: Map<String, Any?>): AbstractMapper<T>? where T : Any {
+        when(obj.simpleName) {
+            BrokenUser::class.java.simpleName -> return BrokenUserMapper(null, map) as AbstractMapper<T>
+            Car::class.java.simpleName -> return CarMapper(null, map) as AbstractMapper<T>
+            Device::class.java.simpleName -> return DeviceMapper(null, map) as AbstractMapper<T>
+            Plant::class.java.simpleName -> return PlantMapper(null, map) as AbstractMapper<T>
+            User::class.java.simpleName -> return UserMapper(null, map) as AbstractMapper<T>
+            UserInfo::class.java.simpleName -> return UserInfoMapper(null, map) as AbstractMapper<T>
+            else -> return null
+        }
+    }
+}
