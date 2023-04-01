@@ -62,8 +62,8 @@ class MapperProcessor : AbstractProcessor() {
                 "com.newagewriter.processor.mapper",
                 "MapperUtils.kt"
             )
-            val writer = file.openWriter()
-            writer.write(mapperUtilsTemplate.compile())
+            val writer = file.openOutputStream()
+            writer.write(mapperUtilsTemplate.compile().toByteArray(Charsets.UTF_8))
             writer.close()
         } catch (ex: Exception) {
             ex.printStackTrace()

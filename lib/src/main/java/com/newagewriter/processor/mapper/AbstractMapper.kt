@@ -1,11 +1,15 @@
 package com.newagewriter.processor.mapper
 
+import com.newagewriter.json.wrapper.JsonWrapper
 import com.newagewriter.processor.converter.ColorConverter
 import com.newagewriter.processor.converter.DateConverter
 import com.newagewriter.processor.converter.GenericConverter
+import com.newagewriter.processor.converter.PrimitiveConverter
 import java.awt.Color
+import java.io.InputStream
 import java.io.InvalidClassException
 import java.lang.reflect.InvocationTargetException
+import java.nio.charset.Charset
 import java.util.*
 import kotlin.collections.HashMap
 import kotlin.reflect.KClass
@@ -176,6 +180,30 @@ abstract class AbstractMapper<T>(
             return mapper?.getMappedObj()
         }
 
+        @JvmStatic
+        fun<T> fromJsonToObject(objClass: Class<T>, stream: InputStream, charset: Charset = Charsets.UTF_8): T? where T : Any {
+            return toObject(objClass, JsonWrapper.jsonToMap(stream, charset))
+        }
+
+        @JvmStatic
+        fun<T> fromJsonToObject(objClass: Class<T>, jsonString: String): T? where T : Any {
+            return toObject(objClass, JsonWrapper.jsonToMap(jsonString))
+        }
+
+        @JvmStatic
+        fun<T> fromJsonToObjectArray(objClass: Class<T>, stream: InputStream, charset: Charset = Charsets.UTF_8): List<T?> where T : Any {
+            return JsonWrapper.jsonToArray(stream, charset).map { map ->
+                toObject(objClass, map)
+            }.toList()
+        }
+
+        @JvmStatic
+        fun<T> fromJsonToObjectArray(objClass: Class<T>, jsonString: String): List<T?> where T : Any {
+            return JsonWrapper.jsonToArray(jsonString).map { map ->
+                toObject(objClass, map)
+            }.toList()
+        }
+
         fun getConverterForType(type: Class<*>): String? {
             return convertersList[type.simpleName]?.javaClass?.toGenericString()
         }
@@ -198,8 +226,10 @@ abstract class AbstractMapper<T>(
 
         private fun<U> castPrimitiveTo(element: Any, type: Class<U>): U {
             return when (type.simpleName) {
-                Byte::class.java.simpleName -> (element as Int).toByte()
-                Short::class.java.simpleName -> (element as Int).toShort()
+                Int::class.java.simpleName -> PrimitiveConverter.toInt(element)
+                Byte::class.java.simpleName -> PrimitiveConverter.toByte(element)
+                Short::class.java.simpleName -> PrimitiveConverter.toShort(element)
+                Float::class.java.simpleName -> PrimitiveConverter.toFloat(element)
                 else -> element
             } as U
         }
