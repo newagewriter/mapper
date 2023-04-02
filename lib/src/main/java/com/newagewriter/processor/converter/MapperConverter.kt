@@ -36,6 +36,8 @@ object MapperConverter {
             "java.lang.Byte" -> "Byte"
             "float",
             "java.lang.Float" -> "Float"
+            "double",
+            "java.lang.Double" -> "Double"
             "boolean",
             "java.lang.Boolean" -> "Boolean"
             "short",
