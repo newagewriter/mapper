@@ -191,14 +191,14 @@ abstract class AbstractMapper<T>(
         }
 
         @JvmStatic
-        fun<T> fromJsonToObjectArray(objClass: Class<T>, stream: InputStream, charset: Charset = Charsets.UTF_8): List<T?> where T : Any {
+        fun<T> fromJsonToArray(objClass: Class<T>, stream: InputStream, charset: Charset = Charsets.UTF_8): List<T?> where T : Any {
             return JsonWrapper.jsonToArray(stream, charset).map { map ->
                 toObject(objClass, map)
             }.toList()
         }
 
         @JvmStatic
-        fun<T> fromJsonToObjectArray(objClass: Class<T>, jsonString: String): List<T?> where T : Any {
+        fun<T> fromJsonToArray(objClass: Class<T>, jsonString: String): List<T?> where T : Any {
             return JsonWrapper.jsonToArray(jsonString).map { map ->
                 toObject(objClass, map)
             }.toList()
@@ -230,6 +230,7 @@ abstract class AbstractMapper<T>(
                 Byte::class.java.simpleName -> PrimitiveConverter.toByte(element)
                 Short::class.java.simpleName -> PrimitiveConverter.toShort(element)
                 Float::class.java.simpleName -> PrimitiveConverter.toFloat(element)
+                Char::class.java.simpleName -> PrimitiveConverter.toChar(element)
                 else -> element
             } as U
         }

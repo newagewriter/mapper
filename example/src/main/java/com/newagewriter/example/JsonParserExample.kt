@@ -14,7 +14,7 @@ object JsonParserExample {
 
         println("check parse array from json to list of object")
         JsonParserExample::class.java.classLoader.getResourceAsStream("users.json")?.let {s ->
-            val users = AbstractMapper.fromJsonToObjectArray(User::class.java, s, Charsets.UTF_8)
+            val users = AbstractMapper.fromJsonToArray(User::class.java, s, Charsets.UTF_8)
             users.forEach {
                 println("user: $it")
             }

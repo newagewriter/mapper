@@ -1,4 +1,4 @@
-package com.newagewriter.extension
+package com.newagewriter.json.library
 
 import java.io.InputStream
 import java.nio.charset.Charset

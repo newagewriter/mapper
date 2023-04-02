@@ -1,4 +1,4 @@
-package com.newagewriter.extension
+package com.newagewriter.json.library
 
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
