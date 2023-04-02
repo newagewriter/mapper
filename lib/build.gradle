@@ -3,6 +3,7 @@ plugins {
     id 'org.jetbrains.kotlin.jvm'
     id "org.jetbrains.kotlin.kapt"
     id 'maven-publish'
+    id 'signing'
 }
 
 group 'com.naw.mapper'
@@ -13,14 +14,24 @@ kotlin {
 
 publishing {
     publications {
-        mapper(MavenPublication) {
+        maven(MavenPublication) {
             from components.java
+            artifact "mapper-kt"
         }
     }
 
     repositories {
+//        maven {
+//            name = "GitHubPackages"
+//            url = "https://maven.pkg.github.com/newagewriter/mapper"
+//            credentials {
+//                username = System.getenv("GITHUB_ACTOR")
+//                password = System.getenv("GITHUB_TOKEN")
+//            }
+//        }
+
         maven {
-            name = "GitHubPackages"
+            name = "MavenCentral"
             url = "https://maven.pkg.github.com/newagewriter/mapper"
             credentials {
                 username = System.getenv("GITHUB_ACTOR")
@@ -82,4 +93,14 @@ tasks.register("ktlintFormat", JavaExec) {
     jvmArgs "--add-opens=java.base/java.lang=ALL-UNNAMED"
     // see https://pinterest.github.io/ktlint/install/cli/#command-line-usage for more information
     args "-F", "src/**/*.kt", "**.kts", "!**/build/**"
+}
+
+task javadocJar(type: Jar) {
+    classifier 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier 'sources'
+    from sourceSets.main.allSource
 }
