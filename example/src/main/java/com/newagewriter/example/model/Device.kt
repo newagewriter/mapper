@@ -1,6 +1,6 @@
 package com.newagewriter.example.model
 
-import com.newagewriter.processor.mapper.Mapper
+import io.github.newagewriter.mapper.Mapper
 
 @Mapper
 data class Device(

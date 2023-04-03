@@ -6,7 +6,7 @@ plugins {
     id 'signing'
 }
 
-group 'com.naw.mapper'
+group 'io.github.newagewriter'
 version lib_version
 
 kotlin {
@@ -14,9 +14,10 @@ kotlin {
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
-            from components.java
+        mavenJavaSnapshot(MavenPublication) {
             artifactId "mapper-kt"
+            version "${lib_version}-SNAPSHOT"
+            from components.java
         }
     }
 
@@ -32,10 +33,10 @@ publishing {
 
         maven {
             name = "MavenCentral"
-            url = "https://maven.pkg.github.com/newagewriter/mapper"
+            url = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
             credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
+                username = System.getenv("nexus_username")
+                password = System.getenv("nexus_password")
             }
         }
     }
@@ -45,8 +46,9 @@ repositories {
     mavenCentral()
 }
 
-artifacts {
-    archives javadocJar, sourcesJar
+java {
+    withJavadocJar()
+    withSourcesJar()
 }
 
 configurations {
@@ -99,12 +101,12 @@ tasks.register("ktlintFormat", JavaExec) {
     args "-F", "src/**/*.kt", "**.kts", "!**/build/**"
 }
 
-task javadocJar(type: Jar) {
-    classifier 'javadoc'
-    from javadoc
+signing {
+    sign publishing.publications.mavenJavaSnapshot
 }
 
-task sourcesJar(type: Jar) {
-    classifier 'sources'
-    from sourceSets.main.allSource
+javadoc {
+    if(JavaVersion.current().isJava9Compatible()) {
+        options.addBooleanOption('html5', true)
+    }
 }

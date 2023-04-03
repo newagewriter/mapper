@@ -1,4 +1,4 @@
-package com.newagewriter.processor.mapper
+package io.github.newagewriter.mapper
 
 /**
  * Annotation class used to prepare mapper for class marked with this annotation

@@ -5,7 +5,7 @@ import com.newagewriter.processor.converter.Converter
 import com.newagewriter.processor.generator.ClassGenerator
 import com.newagewriter.processor.generator.MapperGenerator
 import com.newagewriter.processor.mapper.AbstractMapper
-import com.newagewriter.processor.mapper.Mapper
+import io.github.newagewriter.mapper.Mapper
 import com.newagewriter.processor.mapper.MapperFactory
 import com.newagewriter.template.TemplateLoader
 import javax.annotation.processing.AbstractProcessor
@@ -20,7 +20,7 @@ import javax.tools.StandardLocation
 
 @AutoService(Process::class)
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
-@SupportedAnnotationTypes(value = ["com.newagewriter.processor.mapper.Mapper", "com.newagewriter.processor.converter.Converter"])
+@SupportedAnnotationTypes(value = ["io.github.newagewriter.mapper.Mapper", "com.newagewriter.processor.converter.Converter"])
 class MapperProcessor : AbstractProcessor() {
     override fun process(annotations: MutableSet<out TypeElement>?, roundEnv: RoundEnvironment?): Boolean {
         try {
