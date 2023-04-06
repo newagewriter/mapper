@@ -14,10 +14,32 @@ kotlin {
 
 publishing {
     publications {
-        mavenJavaSnapshot(MavenPublication) {
+        mavenJava(MavenPublication) {
             artifactId "mapper-kt"
-            version "${lib_version}-SNAPSHOT"
+            version "${lib_version}"
             from components.java
+            pom {
+                name = 'mapper-kt'
+                description = 'Mapper library that convert map to object and object to map for kotlin class'
+                url = 'https://github.com/newagewriter/mapper'
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'https://mit-license.org/'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'newagewriter'
+                        name = 'Krzysztof Betlej'
+                        email = 'pisarzenowejery@gmail.com'
+                    }
+                }
+                scm {
+                    connection = 'git@github.com:newagewriter/mapper.git'
+                    url = 'https://github.com/newagewriter/mapper'
+                }
+            }
         }
     }
 
@@ -33,10 +55,12 @@ publishing {
 
         maven {
             name = "MavenCentral"
-            url = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+            def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
             credentials {
-                username = System.getenv("nexus_username")
-                password = System.getenv("nexus_password")
+                username = System.getenv("JRELEASER_NEXUS2_USERNAME")
+                password = System.getenv("JRELEASER_NEXUS2_PASSWORD")
             }
         }
     }
@@ -45,6 +69,9 @@ publishing {
 repositories {
     mavenCentral()
 }
+
+sourceCompatibility = 8
+targetCompatibility = 8
 
 java {
     withJavadocJar()
@@ -102,7 +129,7 @@ tasks.register("ktlintFormat", JavaExec) {
 }
 
 signing {
-    sign publishing.publications.mavenJavaSnapshot
+    sign publishing.publications.mavenJava
 }
 
 javadoc {
