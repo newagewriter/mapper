@@ -129,6 +129,7 @@ tasks.register("ktlintFormat", JavaExec) {
 }
 
 signing {
+    useGpgCmd()
     sign publishing.publications.mavenJava
 }
 

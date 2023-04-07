@@ -51,13 +51,24 @@ jobs:
 #          asset_path: ./lib/build/libs/lib-0.2.4.jar
 #          asset_name: lib-0.2.4.jar
 #          asset_content_type: application/java-archive
+      - id: install-secret-key
+        name: Install gpg secret key
+        run: |
+          sudo apt-get install ca-certificates
+          # Install gpg secret key
+          cat <(echo -e "${{ secrets.JRELEASER_GPG_SECRET_KEY }}") | base64 --decode | gpg --batch --no-tty --import
+          # Verify gpg secret key
+          gpg --list-secret-keys --keyid-format LONG
+          # mutt GPG tty setting
+          export GPG_TTY=$(tty)
+          echo "export GPG_TTY=\$(tty)" >> ~/.bash_profile
+          echo use-agent >> ~/.gnupg/gpg.conf
+          echo pinentry-mode loopback >> ~/.gnupg/gpg.conf
+          echo allow-loopback-pinentry >> ~/.gnupg/gpg-agent.conf
       - name: Publish package
         uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
         with:
-          arguments: |
-            publish
-            -Psigning.gnupg.passphrase=${{ secrets.JRELEASER_GPG_PASSPHRASE }}
-            -Psigning.gnupg.keyName=${{ secrets.JRELEASER_GPG_PUBLIC_KEY: (-8) }}
+          arguments: publish -Psigning.gnupg.passphrase=${{ secrets.JRELEASER_GPG_PASSPHRASE }} -Psigning.gnupg.keyName=${{ secrets.JREALEASE_KEY_NAME }}
         env:
           JRELEASER_NEXUS2_USERNAME: ${{ secrets.JRELEASER_NEXUS2_USERNAME }}
           JRELEASER_NEXUS2_PASSWORD: ${{ secrets.JRELEASER_NEXUS2_PASSWORD }}
