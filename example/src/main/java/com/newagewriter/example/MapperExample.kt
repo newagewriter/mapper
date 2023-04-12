@@ -2,7 +2,7 @@ package com.newagewriter.example
 
 import com.newagewriter.example.model.*
 import com.newagewriter.example.model.mapper.CarMapper
-import com.newagewriter.processor.mapper.AbstractMapper
+import io.github.newagewriter.processor.mapper.AbstractMapper
 import java.awt.Color
 import java.util.*
 import javax.swing.DebugGraphics
@@ -28,7 +28,7 @@ object MapperExample {
             "userInfo" to mapOf<String, Any?>(
                 "avatarUrl" to "https://myavatar.url",
                 "weight" to 50f,
-                "lastUpdate" to Date().time
+                "lastUpdate" to DateConverter().toSimpleValue(Date())
             ),
             "isValidate" to true
         )

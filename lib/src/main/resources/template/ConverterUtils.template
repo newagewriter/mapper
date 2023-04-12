@@ -1,0 +1,13 @@
+package io.github.newagewriter.processor.converter
+object ConverterUtils {
+
+    @JvmStatic
+    public fun initConverters(): Map<String, GenericConverter<*, *>> {
+        val converters = HashMap<String, GenericConverter<*, *>>()
+        @foreach($map as key -> value):
+        converters.put("$key", $value())
+        @end
+        return converters
+
+    }
+}

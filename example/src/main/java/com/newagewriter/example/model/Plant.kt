@@ -1,9 +1,9 @@
 package com.newagewriter.example.model
 
-import com.newagewriter.processor.mapper.Mapper
+import io.github.newagewriter.mapper.Mapper
 import java.awt.Color
 
-//@Mapper
+@Mapper
 data class Plant(
     val name: String,
     val type: PlantType,

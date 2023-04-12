@@ -1,0 +1,11 @@
+{
+  "name" : "Jan Kowalski",
+  "id" : 1,
+  "userInfo" : {
+    "avatarUrl" : "http://url.sample.com",
+    "weight" : 51.0,
+    "lastUpdate" : "2023-03-27"
+  },
+  "isValidate" : true,
+  "state" : "ACTIVE"
+}

@@ -1,7 +1,7 @@
 package com.newagewriter
 
-import com.newagewriter.processor.mapper.AbstractMapper
-import com.newagewriter.processor.mapper.Mapper
+import io.github.newagewriter.mapper.Mapper
+import io.github.newagewriter.processor.mapper.AbstractMapper
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import java.awt.Color
@@ -30,14 +30,12 @@ class ColorFieldMapperTest {
     fun testConvertMapToModel() {
         val map = mapOf(
             "firstColor" to Color.GREEN.rgb,
-            "secondColor" to Color.BLUE.rgb,
+            "secondColor" to Color.BLUE.rgb
         )
         AbstractMapper.toObject(ModelWithColor::class.java, map)?.let { model ->
 
             Assertions.assertEquals(map["firstColor"], model.firstColor.rgb, "Incorrect value for field: firstColor")
             Assertions.assertEquals(map["secondColor"], model.secondColor.rgb, "Incorrect value for field: secondColor")
         } ?: Assertions.fail("Model is null, cannot convert map to model.")
-
-
     }
 }

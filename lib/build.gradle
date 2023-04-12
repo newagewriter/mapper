@@ -3,9 +3,10 @@ plugins {
     id 'org.jetbrains.kotlin.jvm'
     id "org.jetbrains.kotlin.kapt"
     id 'maven-publish'
+    id 'signing'
 }
 
-group 'com.naw.mapper'
+group 'io.github.newagewriter'
 version lib_version
 
 kotlin {
@@ -13,18 +14,53 @@ kotlin {
 
 publishing {
     publications {
-        mapper(MavenPublication) {
+        mavenJava(MavenPublication) {
+            artifactId "mapper-kt"
+            version "${lib_version}"
             from components.java
+            pom {
+                name = 'mapper-kt'
+                description = 'Mapper library that convert map to object and object to map for kotlin class'
+                url = 'https://github.com/newagewriter/mapper'
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'https://mit-license.org/'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'newagewriter'
+                        name = 'Krzysztof Betlej'
+                        email = 'pisarzenowejery@gmail.com'
+                    }
+                }
+                scm {
+                    connection = 'git@github.com:newagewriter/mapper.git'
+                    url = 'https://github.com/newagewriter/mapper'
+                }
+            }
         }
     }
 
     repositories {
+//        maven {
+//            name = "GitHubPackages"
+//            url = "https://maven.pkg.github.com/newagewriter/mapper"
+//            credentials {
+//                username = System.getenv("GITHUB_ACTOR")
+//                password = System.getenv("GITHUB_TOKEN")
+//            }
+//        }
+
         maven {
-            name = "GitHubPackages"
-            url = "https://maven.pkg.github.com/newagewriter/mapper"
+            name = "MavenCentral"
+            def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
             credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
+                username = System.getenv("JRELEASER_NEXUS2_USERNAME")
+                password = System.getenv("JRELEASER_NEXUS2_PASSWORD")
             }
         }
     }
@@ -32,13 +68,31 @@ publishing {
 
 repositories {
     mavenCentral()
-    mavenCentral()
+}
+
+sourceCompatibility = 8
+targetCompatibility = 8
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+configurations {
+    ktlint
 }
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib"
     implementation "org.jetbrains.kotlin:kotlin-reflect"
     implementation 'com.google.auto.service:auto-service:1.0.1'
+//    implementation 'org.json:json:20230227'
+    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+    ktlint("com.pinterest:ktlint:0.48.2") {
+        attributes {
+            attribute(Bundling.BUNDLING_ATTRIBUTE, getObjects().named(Bundling, Bundling.EXTERNAL))
+        }
+    }
 
     kapt group: 'com.google.auto.service', name: 'auto-service', version: '1.0.1'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
@@ -49,4 +103,38 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+tasks.register("ktlintCheck", JavaExec) {
+    group = "verification"
+    description = "Check Kotlin code style."
+    classpath = configurations.ktlint
+    mainClass = "com.pinterest.ktlint.Main"
+    // see https://pinterest.github.io/ktlint/install/cli/#command-line-usage for more information
+    args "src/**/*.kt", "**.kts", "!**/build/**"
+}
+
+tasks.named("check") {
+    dependsOn tasks.named("ktlintCheck")
+}
+
+tasks.register("ktlintFormat", JavaExec) {
+    group = "formatting"
+    description = "Fix Kotlin code style deviations."
+    classpath = configurations.ktlint
+    mainClass = "com.pinterest.ktlint.Main"
+    jvmArgs "--add-opens=java.base/java.lang=ALL-UNNAMED"
+    // see https://pinterest.github.io/ktlint/install/cli/#command-line-usage for more information
+    args "-F", "src/**/*.kt", "**.kts", "!**/build/**"
+}
+
+signing {
+    useGpgCmd()
+    sign publishing.publications.mavenJava
+}
+
+javadoc {
+    if(JavaVersion.current().isJava9Compatible()) {
+        options.addBooleanOption('html5', true)
+    }
 }
