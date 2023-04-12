@@ -1,13 +1,14 @@
 package io.github.newagewriter.processor
 
 import com.google.auto.service.AutoService
+import io.github.newagewriter.mapper.Mapper
 import io.github.newagewriter.processor.converter.Converter
 import io.github.newagewriter.processor.generator.ClassGenerator
 import io.github.newagewriter.processor.generator.MapperGenerator
 import io.github.newagewriter.processor.mapper.AbstractMapper
 import io.github.newagewriter.processor.mapper.MapperFactory
 import io.github.newagewriter.template.TemplateLoader
-import io.github.newagewriter.mapper.Mapper
+import java.io.IOException
 import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.RoundEnvironment
 import javax.annotation.processing.SupportedAnnotationTypes
@@ -65,7 +66,7 @@ class MapperProcessor : AbstractProcessor() {
             val writer = file.openOutputStream()
             writer.write(mapperUtilsTemplate.compile().toByteArray(Charsets.UTF_8))
             writer.close()
-        } catch (ex: Exception) {
+        } catch (ex: IOException) {
             ex.printStackTrace()
         } finally {
             ProcessorLogger.stop()
@@ -124,7 +125,7 @@ class MapperProcessor : AbstractProcessor() {
             val writer = file.openWriter()
             writer.write(converterTemplate.compile())
             writer.close()
-        } catch (ex: Exception) {
+        } catch (ex: IOException) {
             ex.printStackTrace()
         }
         ProcessorLogger.stop()

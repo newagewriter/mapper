@@ -1,5 +1,6 @@
 package io.github.newagewriter.processor
 
+import java.io.IOException
 import java.io.Writer
 import java.util.Date
 import javax.annotation.processing.ProcessingEnvironment
@@ -16,7 +17,7 @@ object ProcessorLogger {
                 "processor_logs.log"
             )
             writer = file.openWriter()
-        } catch (ex: Exception) {
+        } catch (ex: IOException) {
             ex.printStackTrace()
         }
     }
@@ -29,7 +30,7 @@ object ProcessorLogger {
     fun stop() {
         try {
             writer?.close()
-        } catch (ex: Exception) {
+        } catch (ex: IOException) {
             ex.printStackTrace()
         } finally {
             writer = null
