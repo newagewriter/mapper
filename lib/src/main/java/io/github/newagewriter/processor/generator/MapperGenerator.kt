@@ -1,7 +1,7 @@
-package com.newagewriter.processor.generator
+package io.github.newagewriter.processor.generator
 
-import com.newagewriter.processor.converter.MapperConverter
-import com.newagewriter.template.TemplateLoader
+import io.github.newagewriter.processor.converter.MapperConverter
+import io.github.newagewriter.template.TemplateLoader
 import java.lang.StringBuilder
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.Element

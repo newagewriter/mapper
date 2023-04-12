@@ -1,4 +1,4 @@
-package com.newagewriter.processor.mapper
+package io.github.newagewriter.processor.mapper
 
 interface MapperFactory {
     fun<T> of(obj: T): AbstractMapper<T>? where T : Any

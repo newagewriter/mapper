@@ -1,6 +1,6 @@
 package com.newagewriter.example.model
 
-import com.newagewriter.processor.BaseUser
+import io.github.newagewriter.processor.BaseUser
 import io.github.newagewriter.mapper.Mapper
 
 @Mapper

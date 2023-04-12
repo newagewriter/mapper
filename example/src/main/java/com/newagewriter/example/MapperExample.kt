@@ -2,7 +2,7 @@ package com.newagewriter.example
 
 import com.newagewriter.example.model.*
 import com.newagewriter.example.model.mapper.CarMapper
-import com.newagewriter.processor.mapper.AbstractMapper
+import io.github.newagewriter.processor.mapper.AbstractMapper
 import java.awt.Color
 import java.util.*
 import javax.swing.DebugGraphics

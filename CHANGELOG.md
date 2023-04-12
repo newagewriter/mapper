@@ -1,3 +1,16 @@
+# 0.3.0
+
+### Feature
+* add json parser: convert from json to model
+* add publishing on maven central
+* Add ktlint custom configuration to chekc kotlin code format
+
+### Fixes
+* Add missing test for all primitive types
+* Rename package to io.github.newagewriter
+* Fix Converter utils for java 11 and above
+* Fix for wrong enum value issue; Remove unnecessary apostrophes
+
 # 0.2.4
 
 ### Feature

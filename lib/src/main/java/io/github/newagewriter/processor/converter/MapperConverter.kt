@@ -1,4 +1,4 @@
-package com.newagewriter.processor.converter
+package io.github.newagewriter.processor.converter
 
 import java.io.InvalidClassException
 import javax.lang.model.element.Element

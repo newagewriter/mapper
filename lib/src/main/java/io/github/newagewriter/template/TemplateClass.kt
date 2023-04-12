@@ -1,4 +1,4 @@
-package com.newagewriter.template
+package io.github.newagewriter.template
 
 import kotlin.text.StringBuilder
 

@@ -2,8 +2,6 @@ name: GitHub release Actions V1
 run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
 on:
   push:
-    branches:
-      - "release/*"
     tags:
       - '*'
 jobs:
@@ -32,25 +30,26 @@ jobs:
         uses: gradle/gradle-build-action@v2
       - run: ./gradlew clean assemble
       - run: echo "🍏 This job's status is ${{ job.status }}."
-#      - name: Create Release
-#        id: create_release
-#        uses: actions/create-release@v1
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        with:
-#          tag_name: ${{ github.ref }}
-#          release_name: Release ${{ github.ref }}
-#          draft: false
-#          prerelease: true
-#      - name: upload artifact
-#        uses: actions/upload-release-asset@v1
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        with:
-#          upload_url: ${{ steps.create_release.outputs.upload_url }}
-#          asset_path: ./lib/build/libs/lib-0.2.4.jar
-#          asset_name: lib-0.2.4.jar
-#          asset_content_type: application/java-archive
+      - run: echo "🍏 check tag lib-${{ github.ref }}.jar"
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: ${{ contains(github.ref, 'beta') }}
+      - name: upload artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./lib/build/libs/lib-${{ github.ref }}.jar
+          asset_name: lib-${{ github.ref }}.jar
+          asset_content_type: application/java-archive
       - id: install-secret-key
         name: Install gpg secret key
         run: |

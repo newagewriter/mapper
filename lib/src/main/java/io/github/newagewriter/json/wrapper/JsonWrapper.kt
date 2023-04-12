@@ -1,7 +1,7 @@
-package com.newagewriter.json.wrapper
+package io.github.newagewriter.json.wrapper
 
-import com.newagewriter.json.library.JsonLibrary
-import com.newagewriter.json.library.JsonLibraryImpl
+import io.github.newagewriter.json.library.JsonLibrary
+import io.github.newagewriter.json.library.JsonLibraryImpl
 import java.io.InputStream
 import java.nio.charset.Charset
 

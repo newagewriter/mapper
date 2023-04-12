@@ -1,6 +1,6 @@
 package com.newagewriter
 
-import com.newagewriter.processor.mapper.AbstractMapper
+import io.github.newagewriter.processor.mapper.AbstractMapper
 import io.github.newagewriter.mapper.Mapper
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test

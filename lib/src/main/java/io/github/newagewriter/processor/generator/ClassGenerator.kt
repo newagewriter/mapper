@@ -1,4 +1,4 @@
-package com.newagewriter.processor.generator
+package io.github.newagewriter.processor.generator
 
 import kotlin.text.StringBuilder
 

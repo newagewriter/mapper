@@ -1,10 +1,10 @@
-package com.newagewriter.processor.mapper
+package io.github.newagewriter.processor.mapper
 
-import com.newagewriter.json.wrapper.JsonWrapper
-import com.newagewriter.processor.converter.ColorConverter
-import com.newagewriter.processor.converter.DateConverter
-import com.newagewriter.processor.converter.GenericConverter
-import com.newagewriter.processor.converter.PrimitiveConverter
+import io.github.newagewriter.json.wrapper.JsonWrapper
+import io.github.newagewriter.processor.converter.ColorConverter
+import io.github.newagewriter.processor.converter.DateConverter
+import io.github.newagewriter.processor.converter.GenericConverter
+import io.github.newagewriter.processor.converter.PrimitiveConverter
 import java.awt.Color
 import java.io.InputStream
 import java.io.InvalidClassException

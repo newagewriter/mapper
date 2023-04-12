@@ -1,4 +1,4 @@
-package com.newagewriter.processor.generator
+package io.github.newagewriter.processor.generator
 
 data class MethodInfo(
     val methodName: String,

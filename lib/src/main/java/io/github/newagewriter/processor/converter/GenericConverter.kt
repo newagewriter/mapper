@@ -1,4 +1,4 @@
-package com.newagewriter.processor.converter
+package io.github.newagewriter.processor.converter
 
 interface GenericConverter<E, V> {
     fun toSimpleValue(entity: E): V

@@ -1,4 +1,4 @@
-package com.newagewriter.processor
+package io.github.newagewriter.processor
 
 import java.io.Writer
 import java.util.Date

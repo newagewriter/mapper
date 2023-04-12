@@ -1,7 +1,7 @@
 package com.newagewriter.example
 
 import com.newagewriter.example.model.User
-import com.newagewriter.processor.mapper.AbstractMapper
+import io.github.newagewriter.processor.mapper.AbstractMapper
 
 object JsonParserExample {
     @JvmStatic

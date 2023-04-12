@@ -1,4 +1,4 @@
-package com.newagewriter.processor
+package io.github.newagewriter.processor
 
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.PackageElement
