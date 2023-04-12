@@ -1,7 +1,7 @@
 package com.newagewriter.example
 
-import com.newagewriter.processor.converter.Converter
-import com.newagewriter.processor.converter.GenericConverter
+import io.github.newagewriter.processor.converter.Converter
+import io.github.newagewriter.processor.converter.GenericConverter
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Date

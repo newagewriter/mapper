@@ -126,7 +126,7 @@ abstract class AbstractMapper<T>(
         lateinit var Factory: MapperFactory
         private val convertersList: MutableMap<String, GenericConverter<*, *>> = HashMap()
         init {
-            val converter = Class.forName("com.newagewriter.processor.converter.ConverterUtils")
+            val converter = Class.forName("io.github.newagewriter.processor.converter.ConverterUtils")
             val initConverters = converter.getMethod("initConverters")
             prepareConverters(
                 mapOf(
@@ -169,13 +169,13 @@ abstract class AbstractMapper<T>(
         @JvmStatic
         fun<T> of(value: T): AbstractMapper<T>? where T : Any {
             // Load MapperUtils to provide correct mapper factory
-            Class.forName("com.newagewriter.processor.mapper.MapperUtils")
+            Class.forName("io.github.newagewriter.processor.mapper.MapperUtils")
             return Factory.of(value)
         }
 
         @JvmStatic
         fun<T> toObject(objClass: Class<T>, map: Map<String, Any?>): T? where T : Any {
-            Class.forName("com.newagewriter.processor.mapper.MapperUtils")
+            Class.forName("io.github.newagewriter.processor.mapper.MapperUtils")
             val mapper = Factory.forClass(objClass, map)
             return mapper?.getMappedObj()
         }

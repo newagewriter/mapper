@@ -2,6 +2,7 @@ package io.github.newagewriter.processor.generator
 
 import io.github.newagewriter.processor.converter.MapperConverter
 import io.github.newagewriter.template.TemplateLoader
+import java.io.IOException
 import java.lang.StringBuilder
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.Element
@@ -73,9 +74,8 @@ class MapperGenerator private constructor() {
             )
             val writer = file.openWriter()
             writer.write(template.compile())
-//            writer.write(content.toString())
             writer.close()
-        } catch (ex: Exception) {
+        } catch (ex: IOException) {
             ex.printStackTrace()
         }
         return content.toString()

@@ -4,8 +4,28 @@
 
 Mapper generator is a library that create Mapper class for model class with @Mapper annotation.
 Mapper class convert object to map/json or create object from given map (json is not supported yet)
+   
 
 ## How to use it
+
+To use mapper library add dependecy to project:
+
+#### For gradle
+```groovy
+dependencies {
+   implementation("io.github.newagewriter:mapper-kt:[version]")
+   kapt("io.github.newagewriter:mapper-kt:[version]")
+}
+   ```
+
+#### For maven
+```maven
+<dependency>
+  <groupId>io.github.newagewriter</groupId>
+  <artifactId>mapper-kt</artifactId>
+  <version>version</version>
+</dependency>
+   ```
 
 1. Add @Mapper annotation to model class:
    ```kotlin
@@ -73,8 +93,8 @@ and second is used to converter type to value. Value must be one of primitive ty
 For example if user want to change the way to save date to map for example as string (by default converter save date as long):
 
 ```kotlin
-    import com.newagewriter.processor.converter.Converter
-    import com.newagewriter.processor.converter.GenericConverter
+    import io.github.newagewriter.processor.converter.Converter
+    import io.github.processor.converter.GenericConverter
     import java.text.DateFormat
     import java.util.Date
     import java.util.Locale

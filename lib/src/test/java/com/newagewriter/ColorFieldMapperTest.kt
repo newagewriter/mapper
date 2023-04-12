@@ -1,7 +1,7 @@
 package com.newagewriter
 
-import io.github.newagewriter.processor.mapper.AbstractMapper
 import io.github.newagewriter.mapper.Mapper
+import io.github.newagewriter.processor.mapper.AbstractMapper
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import java.awt.Color
