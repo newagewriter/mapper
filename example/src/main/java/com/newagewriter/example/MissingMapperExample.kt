@@ -2,7 +2,7 @@ package com.newagewriter.example
 
 import com.newagewriter.example.model.broken.BrokenUser
 import com.newagewriter.example.model.broken.BrokenUserInfo
-import com.newagewriter.processor.mapper.AbstractMapper
+import io.github.newagewriter.processor.mapper.AbstractMapper
 
 object MissingMapperExample {
 

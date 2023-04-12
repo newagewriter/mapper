@@ -2,7 +2,7 @@ package com.newagewriter
 
 import com.newagewriter.model.ObjectWithEnum
 import com.newagewriter.model.SomeEnum
-import com.newagewriter.processor.mapper.AbstractMapper
+import io.github.newagewriter.processor.mapper.AbstractMapper
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
