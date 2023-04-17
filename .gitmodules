@@ -1,0 +1,3 @@
+[submodule "json_library"]
+	path = json_library
+	url = https://github.com/newagewriter/json-simple-kt.git

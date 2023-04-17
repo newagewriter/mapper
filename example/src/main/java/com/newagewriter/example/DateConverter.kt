@@ -8,7 +8,7 @@ import java.util.Date
 import java.util.Locale
 
 @Converter(type = Date::class)
-class DateConverter : GenericConverter<Date, String> {
+class DateConverter : GenericConverter<Date, String>() {
     private val dateFormat: DateFormat = SimpleDateFormat("yyyy-MM-dd")
     override fun toSimpleValue(entity: Date): String {
         return dateFormat.format(entity)

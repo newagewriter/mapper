@@ -4,11 +4,16 @@ import ${value}.${key}
 import ${value}.mapper.${key}Mapper
 @end
 
-object MapperUtils : MapperFactory {
+/**
+ * GeneratedMapperFactory is auto generated class. Do not change this file.
+ * All changes made in this class will be remove after rebuild
+ */
+object GeneratedMapperFactory : MapperFactory {
 
     init {
         AbstractMapper.Factory = this
     }
+
     public override fun <T> of(obj: T): AbstractMapper<T>? where T : Any {
         when(obj) {
         @foreach($types):
@@ -16,7 +21,6 @@ object MapperUtils : MapperFactory {
         @end
             else -> return null
         }
-
     }
 
     public override fun <T> forClass(obj: Class<T>, map: Map<String, Any?>): AbstractMapper<T>? where T : Any {

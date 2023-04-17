@@ -3,10 +3,8 @@ package io.github.newagewriter.processor
 import com.google.auto.service.AutoService
 import io.github.newagewriter.mapper.Mapper
 import io.github.newagewriter.processor.converter.Converter
-import io.github.newagewriter.processor.generator.ClassGenerator
 import io.github.newagewriter.processor.generator.MapperGenerator
 import io.github.newagewriter.processor.mapper.AbstractMapper
-import io.github.newagewriter.processor.mapper.MapperFactory
 import io.github.newagewriter.template.TemplateLoader
 import java.io.IOException
 import javax.annotation.processing.AbstractProcessor
@@ -41,27 +39,14 @@ class MapperProcessor : AbstractProcessor() {
                     .generateFile()
             }
             roundEnv?.getElementsAnnotatedWith(Converter::class.java)?.let { generateConverterList(it) }
-            val mapperUtilsTemplate = TemplateLoader.load("MapperUtils")
+            val mapperUtilsTemplate = TemplateLoader.load("GeneratedMapperFactory")
             mapperUtilsTemplate
                 .addVariable("types", mapperList.keys)
                 .addVariable("mapperList", mapperList)
-            val mapperUtilsClass = ClassGenerator()
-                .setClassType(ClassGenerator.ClassType.OBJECT)
-                .setPackage("com.newagewriter.processor.mapper")
-                .addInterface(MapperFactory::class.java)
-                .setClassSignature("MapperUtils")
-                .setInitBlock("AbstractMapper.Factory = this")
-                .overrideMethod("<T> of", listOf("obj: T"), "AbstractMapper<T>? where T : Any", getOfMethodContent(mapperList))
-                .overrideMethod("<T> forClass", listOf("obj: Class<T>, map: Map<String, Any?>"), "AbstractMapper<T>? where T : Any", getForClassMethodContent(mapperList))
-
-            mapperList.forEach { t, u ->
-                mapperUtilsClass.addImport("$u.$t")
-                mapperUtilsClass.addImport("$u.mapper.${t}Mapper")
-            }
             val file = processingEnv.filer.createResource(
                 StandardLocation.SOURCE_OUTPUT,
                 "com.newagewriter.processor.mapper",
-                "MapperUtils.kt"
+                "GeneratedMapperFactory.kt"
             )
             val writer = file.openOutputStream()
             writer.write(mapperUtilsTemplate.compile().toByteArray(Charsets.UTF_8))
