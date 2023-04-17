@@ -15,18 +15,35 @@ import kotlin.collections.HashMap
 import kotlin.reflect.KClass
 import kotlin.reflect.KParameter
 
-abstract class AbstractMapper<T>(
+/**
+ * Base class for all generated mapper. Contains methods that are common for every converter
+ * Class contains only one protected constructor to initialize class with object or with map
+ * Class that extend [AbstractMapper] must implement two methods:
+ * # [toMap] - : method convert internal object to map
+ * # [createMappedObj] - create object from internal map
+ */
+abstract class AbstractMapper<T> protected constructor(
     protected var obj: T?,
     protected val objMap: Map<String, Any?>? = null
 ) where T : Any {
     private var needRefresh = false
 
-    constructor(objMap: Map<String, Any?>) : this(null, objMap)
-
+    /**
+     * Method convert object [obj] to Map
+     * @return map with all fields from object [obj]
+     */
     abstract fun toMap(): Map<String, Any?>
 
+    /**
+     * Method convert map to object
+     * @return
+     */
     protected abstract fun createMappedObj(): T
 
+    /**
+     * Method convert object of [T] class to json
+     * @return Json string for object [obj]
+     */
     fun toJson(): String {
         val result = toMap()
         val builder = StringBuilder()
@@ -42,6 +59,11 @@ abstract class AbstractMapper<T>(
         return builder.toString()
     }
 
+    /**
+     * Method get object of [T] class. If [obj] fields is null or need refresh
+     * call [createMappedObj] to create object before return
+     * @return object of [T] class
+     */
     fun getMappedObj(): T {
         if (obj == null || needRefresh) {
             obj = createMappedObj()
@@ -65,22 +87,6 @@ abstract class AbstractMapper<T>(
         }
     }
 
-    @Suppress("UNCHECKED_CAST")
-    protected fun createObject(classInfo: Class<T>): T {
-        return objMap?.let { map ->
-            var result: T? = null
-            classInfo.constructors.forEach {
-                val args = prepareArgs(map)
-                result = it.newInstance(args) as T
-            }
-            result
-        } ?: throw NullPointerException("To create object of ${classInfo.simpleName} map cannot be null")
-    }
-
-    protected fun<U> asType(cl: Class<U>, obj: Any?): U {
-        return cl.cast(obj)
-    }
-
     private fun prepareArgs(map: Map<String, Any?>): Array<Any?> {
         return map.map {
             it.value
@@ -94,8 +100,8 @@ abstract class AbstractMapper<T>(
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun<T> getConverter(classInfo: Class<T>): GenericConverter<T, Any>? {
-        return convertersList[classInfo.simpleName] as GenericConverter<T, Any>?
+    private fun<T> getConverter(classInfo: Class<T>): GenericConverter<T, Comparable<Any>>? {
+        return convertersList[classInfo.simpleName] as GenericConverter<T, Comparable<Any>>?
     }
 
     protected fun createFromMap(map: Map<String, Any?>, clazz: KClass<T>): T {
@@ -138,14 +144,17 @@ abstract class AbstractMapper<T>(
             prepareConverters(initConverters.invoke(null) as? Map<String, GenericConverter<*, *>>)
         }
 
+        /**
+         * Static
+         */
         @JvmStatic
         @Suppress("UNCHECKED_CAST")
-        fun<U> toType(type: Class<U>, element: Any?): U where U : Any {
+        protected fun<U> toType(type: Class<U>, element: Any?): U where U : Any {
             return if (element == null) {
                 throw NullPointerException("Object is null")
-            } else if (isPrimitive(type)) {
-                castPrimitiveTo(element, type)
-            } else if (convertersList.containsKey(type.simpleName)) {
+            } else if (PrimitiveConverter.isPrimitive(type)) {
+                PrimitiveConverter.castPrimitiveTo(element, type)
+            } else if (element is Comparable<*> && convertersList.containsKey(type.simpleName)) {
                 val value: GenericConverter<U, Any> = convertersList[type.simpleName] as GenericConverter<U, Any>
                 value.toEntity(element)
             } else if (type.isEnum) {
@@ -166,30 +175,61 @@ abstract class AbstractMapper<T>(
             }
         }
 
+        /**
+         * Method get proper mapper instance for given object
+         * @param value - object used to find proper mapper
+         * @return mapper for given object or null if mapper for it doesn't exist
+         */
         @JvmStatic
         fun<T> of(value: T): AbstractMapper<T>? where T : Any {
             // Load MapperUtils to provide correct mapper factory
-            Class.forName("io.github.newagewriter.processor.mapper.MapperUtils")
+            Class.forName("io.github.newagewriter.processor.mapper.GeneratedMapperFactory")
             return Factory.of(value)
         }
 
+        /**
+         * Method convert given map to object of given type using proper mapper
+         * @param objClass - type of object
+         * @param map - map with values
+         * @return object of given type or null if that conversion cannot be made
+         */
         @JvmStatic
         fun<T> toObject(objClass: Class<T>, map: Map<String, Any?>): T? where T : Any {
-            Class.forName("io.github.newagewriter.processor.mapper.MapperUtils")
+            Class.forName("io.github.newagewriter.processor.mapper.GeneratedMapperFactory")
             val mapper = Factory.forClass(objClass, map)
             return mapper?.getMappedObj()
         }
 
+        /**
+         * Method convert json inside given stream to object of given type.
+         * @param objClass - type to convert
+         * @param stream - stream containing json
+         * @param charset - Charset format for given stream
+         * @return object of given type or null if that conversion cannot be made
+         */
         @JvmStatic
         fun<T> fromJsonToObject(objClass: Class<T>, stream: InputStream, charset: Charset = Charsets.UTF_8): T? where T : Any {
             return toObject(objClass, JsonWrapper.jsonToMap(stream, charset))
         }
 
+        /**
+         * Method convert json string to object of given type
+         * @param objClass - type to convert
+         * @param jsonString - json string
+         * @return object of given type or null if that conversion cannot be made
+         */
         @JvmStatic
         fun<T> fromJsonToObject(objClass: Class<T>, jsonString: String): T? where T : Any {
             return toObject(objClass, JsonWrapper.jsonToMap(jsonString))
         }
 
+        /**
+         * Method convert json inside given stream to list containing object of given type.
+         * @param objClass - type to convert
+         * @param stream - stream containing json
+         * @param charset - Charset format for given stream
+         * @return array containing object of given type or empty list if that conversion cannot be made
+         */
         @JvmStatic
         fun<T> fromJsonToArray(objClass: Class<T>, stream: InputStream, charset: Charset = Charsets.UTF_8): List<T?> where T : Any {
             return JsonWrapper.jsonToArray(stream, charset).map { map ->
@@ -197,42 +237,17 @@ abstract class AbstractMapper<T>(
             }.toList()
         }
 
+        /**
+         * Method convert given json string to list containing object of given type.
+         * @param objClass - type to convert
+         * @param jsonString - string containing json
+         * @return array containing object of given type or empty list if that conversion cannot be made
+         */
         @JvmStatic
         fun<T> fromJsonToArray(objClass: Class<T>, jsonString: String): List<T?> where T : Any {
             return JsonWrapper.jsonToArray(jsonString).map { map ->
                 toObject(objClass, map)
             }.toList()
-        }
-
-        fun getConverterForType(type: Class<*>): String? {
-            return convertersList[type.simpleName]?.javaClass?.toGenericString()
-        }
-
-        @JvmStatic
-        protected fun isPrimitive(type: Class<*>): Boolean {
-            return when (type.simpleName) {
-                String::class.java.simpleName,
-                Char::class.java.simpleName,
-                Boolean::class.java.simpleName,
-                Byte::class.java.simpleName,
-                Short::class.java.simpleName,
-                Int::class.java.simpleName,
-                Long::class.java.simpleName,
-                Float::class.java.simpleName,
-                Double::class.java.simpleName -> true
-                else -> false
-            }
-        }
-
-        private fun<U> castPrimitiveTo(element: Any, type: Class<U>): U {
-            return when (type.simpleName) {
-                Int::class.java.simpleName -> PrimitiveConverter.toInt(element)
-                Byte::class.java.simpleName -> PrimitiveConverter.toByte(element)
-                Short::class.java.simpleName -> PrimitiveConverter.toShort(element)
-                Float::class.java.simpleName -> PrimitiveConverter.toFloat(element)
-                Char::class.java.simpleName -> PrimitiveConverter.toChar(element)
-                else -> element
-            } as U
         }
     }
 }
