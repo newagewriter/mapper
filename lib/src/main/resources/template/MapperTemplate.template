@@ -3,7 +3,13 @@ package ${classPackage}.mapper
 import io.github.newagewriter.processor.mapper.AbstractMapper
 import ${classPackage}.${className}
 
+/**
+ * ${className}Mapper is auto generated class. Do not change this file.
+ * All changes made in this class will be remove after rebuild
+ */
 class ${className}Mapper(mappedObject : ${className}?, map: Map<String, Any?>? = null) : AbstractMapper<${className}>(mappedObject, map) {
+    constructor(objMap: Map<String, Any?>) : this(null, objMap)
+
     public override fun toMap(): Map<String, Any?> {
         return obj?.let { o ->
             val result = mapOf<String, Any?>(
