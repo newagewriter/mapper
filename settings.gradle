@@ -1,4 +1,5 @@
 rootProject.name = 'mapper_kt'
 include ':lib'
 include 'example'
+include 'json_library'
 
