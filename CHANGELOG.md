@@ -1,4 +1,10 @@
-# 0.3.0
+# 0.3.0-rc
+
+### Feature
+* Add documentation for the most important classes
+* Move all method that convert primitive from AbstractMapper to PrimitiveConverter
+
+# 0.3.0-beta
 
 ### Feature
 * add json parser: convert from json to model
