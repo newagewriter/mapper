@@ -1,6 +1,12 @@
+# 0.3.0-rc2
+
+### Fixes
+* Remove json-simple library as submodule and use maven dependency instead to fix maven error
+
 # 0.3.0-rc
 
 ### Feature
+* Add required check for every class that extend GenericConverter
 * Add documentation for the most important classes
 * Move all method that convert primitive from AbstractMapper to PrimitiveConverter
 
