@@ -86,7 +86,8 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib"
     implementation "org.jetbrains.kotlin:kotlin-reflect"
     implementation 'com.google.auto.service:auto-service:1.0.1'
-    implementation project(":json_library")
+//    implementation project(":json_library")
+    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
     ktlint("com.pinterest:ktlint:0.48.2") {
         attributes {
             attribute(Bundling.BUNDLING_ATTRIBUTE, getObjects().named(Bundling, Bundling.EXTERNAL))
