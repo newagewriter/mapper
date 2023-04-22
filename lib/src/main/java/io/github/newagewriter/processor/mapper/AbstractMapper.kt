@@ -128,9 +128,11 @@ abstract class AbstractMapper<T> protected constructor(
         throw InvocationTargetException(Exception("Cannot find constructor for given map: $map"))
     }
 
+    @Suppress("UNCHECKED_CAST")
     companion object {
         lateinit var Factory: MapperFactory
         private val convertersList: MutableMap<String, GenericConverter<*, *>> = HashMap()
+
         init {
             val converter = Class.forName("io.github.newagewriter.processor.converter.ConverterUtils")
             val initConverters = converter.getMethod("initConverters")

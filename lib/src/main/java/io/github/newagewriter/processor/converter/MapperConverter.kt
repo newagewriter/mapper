@@ -1,7 +1,10 @@
 package io.github.newagewriter.processor.converter
 
+import io.github.newagewriter.processor.mapper.AbstractMapper
 import java.io.InvalidClassException
+import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.Element
+import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeKind
 
 object MapperConverter {
@@ -28,7 +31,7 @@ object MapperConverter {
         }
     }
 
-    fun getKotlinTypeForElement(field: Element): String {
+    private fun getKotlinTypeForElement(field: Element): String {
         return when (field.asType().toString()) {
             "int",
             "java.lang.Integer" -> "Int"
@@ -47,7 +50,16 @@ object MapperConverter {
             "char",
             "java.lang.Character " -> "Char"
             "java.lang.String" -> "String"
-            else -> "${field.asType()}"
+            else -> field.asType().toString()
+        }
+    }
+
+    private fun getTypeForOthers(env: ProcessingEnvironment, field: Element): String {
+        val listType = env.elementUtils.getTypeElement("java.util.List").asType()
+        if (env.typeUtils.isAssignable(field.asType(), listType)) {
+            return "java.util.List:${(field.asType() as DeclaredType).typeArguments[0]}"
+        } else {
+            return field.asType().toString()
         }
     }
 
@@ -66,5 +78,46 @@ object MapperConverter {
         }
         result.append("]")
         return result.toString()
+    }
+
+    fun getValueForType(field: Element): String {
+        if (field.asType().toString().startsWith("java.util.List")) {
+            val inListType = (field.asType() as DeclaredType).typeArguments[0]
+            return "MapperConverter.useList($inListType::class.java, map[\"${field.simpleName}\"])"
+        } else {
+            val value = getKotlinTypeForElement(field)
+            return "toType($value::class.java, map[\"${field.simpleName}\"])"
+        }
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    fun<U> useList(clazz: Class<U>, obj: Any?): List<U>? where U : Any {
+        return when (obj) {
+            is List<*> -> {
+                val result = mutableListOf<U>()
+                obj.forEach {
+                    when (it) {
+                        is Map<*, *> -> {
+                            result.add(AbstractMapper.toObject(clazz, it as Map<String, Any?>) as U)
+                        }
+                        else -> result.add(it as U)
+                    }
+                }
+                result
+            }
+            is Array<*> -> {
+                val result = mutableListOf<U>()
+                obj.forEach {
+                    when (it) {
+                        is Map<*, *> -> {
+                            result.add(AbstractMapper.toObject(clazz, it as Map<String, Any?>) as U)
+                        }
+                        else -> result.add(it as U)
+                    }
+                }
+                result
+            }
+            else -> null
+        }
     }
 }

@@ -14,6 +14,7 @@ object PrimitiveConverter {
      * @param type - type to be cast
      * @return object of given type or exception if cast cannot be made
      */
+    @Suppress("UNCHECKED_CAST")
     fun<U> castPrimitiveTo(element: Any, type: Class<U>): U {
         return when (type.simpleName) {
             Int::class.java.simpleName -> toInt(element)
@@ -50,6 +51,7 @@ object PrimitiveConverter {
      * @param element - element to convert
      * @return Char value or exception if cast cannot be made
      */
+    @Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN")
     fun toChar(element: Any): Char {
         return when (element) {
             is Character -> element.charValue()

@@ -14,6 +14,7 @@ object GeneratedMapperFactory : MapperFactory {
         AbstractMapper.Factory = this
     }
 
+    @Suppress("UNCHECKED_CAST")
     public override fun <T> of(obj: T): AbstractMapper<T>? where T : Any {
         when(obj) {
         @foreach($types):

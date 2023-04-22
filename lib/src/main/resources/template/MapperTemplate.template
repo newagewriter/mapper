@@ -1,5 +1,6 @@
 package ${classPackage}.mapper
 
+import io.github.newagewriter.processor.converter.MapperConverter
 import io.github.newagewriter.processor.mapper.AbstractMapper
 import ${classPackage}.${className}
 
@@ -26,7 +27,7 @@ class ${className}Mapper(mappedObject : ${className}?, map: Map<String, Any?>? =
             val convertedMap = mutableMapOf<String, Any?>()
             @foreach($map as key -> value):
             if (map.contains("$key")) {
-                convertedMap["$key"] = toType($value::class.java, map["$key"])
+                convertedMap["$key"] = $value
             }
             @end
             createFromMap(convertedMap, ${className}::class)
