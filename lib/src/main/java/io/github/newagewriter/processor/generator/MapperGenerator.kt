@@ -59,7 +59,7 @@ class MapperGenerator private constructor() {
 
         val fieldsName = getFields(el).map { e -> e.simpleName.toString() }
         val fields = getFields(el)
-            .map { e -> e.simpleName to MapperConverter.getKotlinTypeForElement(e) }.toMap()
+            .map { e -> e.simpleName to MapperConverter.getValueForType(e) }.toMap()
         val template = TemplateLoader.load("MapperTemplate")
             .addVariable("className", el.simpleName)
             .addVariable("classPackage", "${packageName.qualifiedName}")
