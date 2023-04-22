@@ -1,3 +1,8 @@
+# 0.3.0
+
+### Fixes
+* Fix issue when mapper model contains list of model
+
 # 0.3.0-rc2
 
 ### Fixes
