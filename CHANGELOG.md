@@ -1,3 +1,12 @@
+# 0.3.1-beta.1
+
+### Feature
+* Basic support android project. ( Not all features may work )
+
+### Fixes
+* Fix build problem when library is used on android project
+* Exclude org.hamrest group, it caused conflict with test library like mockito and android espresso
+
 # 0.3.0
 
 ### Fixes
