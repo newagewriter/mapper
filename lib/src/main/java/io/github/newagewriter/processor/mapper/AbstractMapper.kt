@@ -1,11 +1,9 @@
 package io.github.newagewriter.processor.mapper
 
 import io.github.newagewriter.json.wrapper.JsonWrapper
-import io.github.newagewriter.processor.converter.ColorConverter
 import io.github.newagewriter.processor.converter.DateConverter
 import io.github.newagewriter.processor.converter.GenericConverter
 import io.github.newagewriter.processor.converter.PrimitiveConverter
-import java.awt.Color
 import java.io.InputStream
 import java.io.InvalidClassException
 import java.lang.reflect.InvocationTargetException
@@ -136,12 +134,14 @@ abstract class AbstractMapper<T> protected constructor(
         init {
             val converter = Class.forName("io.github.newagewriter.processor.converter.ConverterUtils")
             val initConverters = converter.getMethod("initConverters")
-            prepareConverters(
-                mapOf(
-                    Date::class.java.simpleName to DateConverter(),
-                    Color::class.java.simpleName to ColorConverter()
-                )
+            val map = mutableMapOf<String, GenericConverter<*, *>>(
+                Date::class.java.simpleName to DateConverter()
             )
+
+            getColorJavaConverters()?.let {
+                map[it.first] = it.second
+            }
+            prepareConverters(map)
 
             prepareConverters(initConverters.invoke(null) as? Map<String, GenericConverter<*, *>>)
         }
@@ -250,6 +250,16 @@ abstract class AbstractMapper<T> protected constructor(
             return JsonWrapper.jsonToArray(jsonString).map { map ->
                 toObject(objClass, map)
             }.toList()
+        }
+
+        private fun getColorJavaConverters(): Pair<String, GenericConverter<*, *>>? {
+            try {
+                val clazz = Class.forName("java.awt.Color")
+                val converterClass: Class<GenericConverter<*, *>> = Class.forName("io.github.newagewriter.processor.converter.ColorConverter") as Class<GenericConverter<*, *>>
+                return clazz.simpleName to converterClass.getDeclaredConstructor().newInstance()
+            } catch (ex: ClassNotFoundException) {
+                return null
+            }
         }
     }
 }

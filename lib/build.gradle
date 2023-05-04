@@ -87,7 +87,9 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-reflect"
     implementation 'com.google.auto.service:auto-service:1.0.1'
 //    implementation project(":json_library")
-    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+    implementation ('com.googlecode.json-simple:json-simple:1.1.1') {
+        exclude group: 'org.hamcrest', module: 'hamcrest-core'
+    }
     ktlint("com.pinterest:ktlint:0.48.2") {
         attributes {
             attribute(Bundling.BUNDLING_ATTRIBUTE, getObjects().named(Bundling, Bundling.EXTERNAL))
@@ -95,8 +97,8 @@ dependencies {
     }
 
     kapt group: 'com.google.auto.service', name: 'auto-service', version: '1.0.1'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
     testImplementation 'com.google.auto.service:auto-service-annotations:1.0.1'
     kaptTest group: 'com.google.auto.service', name: 'auto-service', version: '1.0.1'
 }
