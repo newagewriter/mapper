@@ -54,9 +54,6 @@ object MapperExample {
 
         println("new plant object $obj")
 
-        val t1: Any = 1
-
-        val t2: Int = t1 as Int
         val car = Car("test", 123456789, 120, 30.5f, Color.GREEN, 5, 'A')
 
         val carMapper = CarMapper(car)
