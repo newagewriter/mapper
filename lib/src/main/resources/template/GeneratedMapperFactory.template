@@ -24,6 +24,7 @@ object GeneratedMapperFactory : MapperFactory {
         }
     }
 
+    @Suppress("UNCHECKED_CAST")
     public override fun <T> forClass(obj: Class<T>, map: Map<String, Any?>): AbstractMapper<T>? where T : Any {
         when(obj.simpleName) {
         @foreach($types):
