@@ -1,3 +1,12 @@
+# 0.3.1
+
+### Feature
+* Support android project for @Mapper and @Converter annotation.
+
+### Fixes
+* Fix build problem when library is used on android project
+* Exclude org.hamrest group, it caused conflict with test library like mockito and android espresso
+
 # 0.3.1-beta.1
 
 ### Feature
