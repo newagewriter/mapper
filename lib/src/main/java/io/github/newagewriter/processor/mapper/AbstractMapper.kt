@@ -4,6 +4,7 @@ import io.github.newagewriter.json.wrapper.JsonWrapper
 import io.github.newagewriter.processor.converter.DateConverter
 import io.github.newagewriter.processor.converter.GenericConverter
 import io.github.newagewriter.processor.converter.PrimitiveConverter
+import io.github.newagewriter.processor.exception.MissingMapperException
 import java.io.InputStream
 import java.io.InvalidClassException
 import java.lang.reflect.InvocationTargetException
@@ -175,6 +176,18 @@ abstract class AbstractMapper<T> protected constructor(
             converters?.let {
                 convertersList.putAll(converters)
             }
+        }
+
+        /**
+         * Method get proper mapper instance for given object
+         * @param value - object used to find proper mapper
+         * @return mapper for given object or null if mapper for it doesn't exist
+         */
+        @JvmStatic
+        fun<T> ofOrThrow(value: T): AbstractMapper<T> where T : Any {
+            // Load MapperUtils to provide correct mapper factory
+            Class.forName("io.github.newagewriter.processor.mapper.GeneratedMapperFactory")
+            return Factory.of(value) ?: throw MissingMapperException("Cannot find mapper for given object type: ${value.javaClass.simpleName}")
         }
 
         /**

@@ -1,5 +1,6 @@
 package io.github.newagewriter.processor.converter
 
+import io.github.newagewriter.annotation.Field
 import io.github.newagewriter.processor.mapper.AbstractMapper
 import java.io.InvalidClassException
 import javax.annotation.processing.ProcessingEnvironment
@@ -80,13 +81,14 @@ object MapperConverter {
         return result.toString()
     }
 
-    fun getValueForType(field: Element): String {
+    fun getValueForType(field: Element, fieldAnnotation: Field?): String {
+        val fieldName = fieldAnnotation?.name ?: field.simpleName.toString()
         if (field.asType().toString().startsWith("java.util.List")) {
             val inListType = (field.asType() as DeclaredType).typeArguments[0]
-            return "MapperConverter.useList($inListType::class.java, map[\"${field.simpleName}\"])"
+            return "MapperConverter.useList($inListType::class.java, map[\"$fieldName\"])"
         } else {
             val value = getKotlinTypeForElement(field)
-            return "toType($value::class.java, map[\"${field.simpleName}\"])"
+            return "toType($value::class.java, map[\"${fieldName}\"])"
         }
     }
 
