@@ -1,5 +1,6 @@
 package io.github.newagewriter.processor.generator
 
+import io.github.newagewriter.annotation.Field
 import io.github.newagewriter.processor.converter.MapperConverter
 import io.github.newagewriter.template.TemplateLoader
 import java.io.IOException
@@ -57,9 +58,17 @@ class MapperGenerator private constructor() {
         val packageName = processingEnv.elementUtils.getPackageOf(el)
         val mapperName = el.simpleName
 
-        val fieldsName = getFields(el).map { e -> e.simpleName.toString() }
+        val fieldsName = getFields(el).map { e ->
+            val fieldAnnotation = e.getAnnotation(Field::class.java)
+            val key = fieldAnnotation?.name ?: e.simpleName.toString()
+            key to e.simpleName.toString()
+        }.toMap()
         val fields = getFields(el)
-            .map { e -> e.simpleName to MapperConverter.getValueForType(e) }.toMap()
+            .map { e ->
+                val fieldAnnotation = e.getAnnotation(Field::class.java)
+                val key = "${fieldAnnotation?.name ?: e.simpleName}:${e.simpleName}"
+                key to MapperConverter.getValueForType(e, fieldAnnotation)
+            }.toMap()
         val template = TemplateLoader.load("MapperTemplate")
             .addVariable("className", el.simpleName)
             .addVariable("classPackage", "${packageName.qualifiedName}")

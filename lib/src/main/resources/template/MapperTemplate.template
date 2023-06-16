@@ -14,8 +14,8 @@ class ${className}Mapper(mappedObject : ${className}?, map: Map<String, Any?>? =
     public override fun toMap(): Map<String, Any?> {
         return obj?.let { o ->
             val result = mapOf<String, Any?>(
-            @foreach($fields, separator=","):
-                "$element" to getValue(o.$element)
+            @foreach($fields as key -> value, separator=","):
+                "$key" to getValue(o.$value)
             @end
             )
             result
@@ -26,8 +26,10 @@ class ${className}Mapper(mappedObject : ${className}?, map: Map<String, Any?>? =
         return  objMap?.let { map ->
             val convertedMap = mutableMapOf<String, Any?>()
             @foreach($map as key -> value):
-            if (map.contains("$key")) {
-                convertedMap["$key"] = $value
+            "$key".split(":").let { parts ->
+                if (map.contains(parts[0])) {
+                    convertedMap[parts[1]] = $value
+                }
             }
             @end
             createFromMap(convertedMap, ${className}::class)
