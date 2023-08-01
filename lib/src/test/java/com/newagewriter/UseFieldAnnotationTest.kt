@@ -1,5 +1,6 @@
 package com.newagewriter
 
+import com.newagewriter.model.ModelWithMultipleAnnotatedFields
 import com.newagewriter.model.ModelWithOneAnnotatedField
 import io.github.newagewriter.processor.mapper.AbstractMapper
 import org.junit.jupiter.api.Assertions
