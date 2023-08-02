@@ -22,29 +22,65 @@ import kotlin.reflect.KParameter
  * # [createMappedObj] - create object from internal map
  */
 abstract class AbstractMapper<T> protected constructor(
-    protected var obj: T?,
-    protected val objMap: Map<String, Any?>? = null
+    protected var clazz: Class<T>
 ) where T : Any {
     private var needRefresh = false
+    protected var obj: T? = null
+    protected var objMap: Map<String, Any?>? = null
+
+    @Deprecated("use constructor with class instance param instead. Deprecated since 0.4.0, will be removed in 0.5.0")
+    constructor(obj: T?, map: Map<String, Any?>? )
+            : this(obj?.javaClass ?: throw ExceptionInInitializerError("obj is null cannot get class instance")) {
+        this.obj = obj
+        this.objMap = map
+    }
+
+    /**
+     * Method convert object [obj] to Map
+     * @param obj - instance of [T] class
+     * @return map with all fields from object [obj]
+     */
+    abstract fun toMap(obj: T): Map<String, Any?>
 
     /**
      * Method convert object [obj] to Map
      * @return map with all fields from object [obj]
      */
-    abstract fun toMap(): Map<String, Any?>
+    @Deprecated("use toMap with [T] params instead", replaceWith = ReplaceWith("toMap(obj)"))
+    fun toMap(): Map<String, Any?> {
+        return toMap(obj ?: throw NullPointerException(""))
+    }
 
     /**
      * Method convert map to object
-     * @return
+     * @param map - map with properties
+     * @return instance of [T] class
      */
-    protected abstract fun createMappedObj(): T
+    abstract fun mapToModel(map: Map<String, Any?>): T
+
+    /**
+     * Method convert map to object
+     * @deprecated Since 0.3.2 method is deprecated
+     * @return instance of [T] class
+     */
+    @Deprecated(
+        "Use mapToModel(map: Map<String, Any?>) instead",
+        replaceWith = ReplaceWith("mapToModel(map)")
+    )
+    open fun createMappedObj(): T {
+        return mapToModel(objMap ?: throw java.lang.NullPointerException("Map is null"))
+    }
+
+    fun toJson(): String {
+        return toJson(obj ?: throw NullPointerException("Object is null"))
+    }
 
     /**
      * Method convert object of [T] class to json
      * @return Json string for object [obj]
      */
-    fun toJson(): String {
-        val result = toMap()
+    fun toJson(obj: T): String {
+        val result = toMap(obj)
         val builder = StringBuilder()
         builder.appendLine("{")
         var first = true
@@ -59,15 +95,16 @@ abstract class AbstractMapper<T> protected constructor(
     }
 
     /**
-     * Method get object of [T] class. If [obj] fields is null or need refresh
-     * call [createMappedObj] to create object before return
+     * Method get object of [T] class.
+     * To do this it calls [createMappedObj] to create object before return
+     * @param map - map of properties that will be converted to fields
      * @return object of [T] class
      */
-    fun getMappedObj(): T {
-        if (obj == null || needRefresh) {
-            obj = createMappedObj()
-        }
-        return obj ?: throw NullPointerException("Something went wrong during object creation")
+    @Deprecated("Use mapToModel(map: Map<String, Any?> instead. " +
+            "Deprecated since 0.4.0, will be removed in 0.5.0 version",
+        ReplaceWith("mapToModel(map)"))
+    fun getMappedObj(map: Map<String, Any?>): T {
+        return createMappedObj()
     }
 
     protected fun getValue(value: Any?): Any? {
@@ -81,7 +118,7 @@ abstract class AbstractMapper<T> protected constructor(
                 is Boolean -> v
                 is String -> "$v"
                 is Enum<*> -> v.name
-                else -> of(v)?.toJson() ?: "$v"
+                else -> of(v.javaClass)?.toJson(v) ?: "$v"
             }
         }
     }
@@ -99,7 +136,7 @@ abstract class AbstractMapper<T> protected constructor(
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun<T> getConverter(classInfo: Class<T>): GenericConverter<T, Comparable<Any>>? {
+    private fun<T> getConverter(classInfo: Class<T>): GenericConverter<T, Comparable<Any>>? where T : Any {
         return convertersList[classInfo.simpleName] as GenericConverter<T, Comparable<Any>>?
     }
 
@@ -165,7 +202,6 @@ abstract class AbstractMapper<T> protected constructor(
                 method.invoke(null, element) as U
             } else if (element is Map<*, *>) {
                 toObject(type, element as Map<String, Any?>)
-                    ?: throw InvalidClassException("Cannot cast $element to class ${type.simpleName}")
             } else {
                 throw InvalidClassException("Cannot cast $element to class ${type.simpleName}")
             }
@@ -180,26 +216,45 @@ abstract class AbstractMapper<T> protected constructor(
 
         /**
          * Method get proper mapper instance for given object
-         * @param value - object used to find proper mapper
+         * @param clazz - java class instance for [T] type
          * @return mapper for given object or null if mapper for it doesn't exist
          */
         @JvmStatic
-        fun<T> ofOrThrow(value: T): AbstractMapper<T> where T : Any {
+        fun<T> ofOrThrow(clazz: Class<T>): AbstractMapper<T> where T : Any {
             // Load MapperUtils to provide correct mapper factory
             Class.forName("io.github.newagewriter.processor.mapper.GeneratedMapperFactory")
-            return Factory.of(value) ?: throw MissingMapperException("Cannot find mapper for given object type: ${value.javaClass.simpleName}")
+            return Factory.forClass(clazz) ?: throw MissingMapperException("Cannot find mapper for given class: ${clazz.simpleName}")
         }
 
         /**
          * Method get proper mapper instance for given object
+         * @deprecated
+         * This method is no longer acceptable to compute time between versions.
+         * <p> Use [of(T::class.java)] instead.
          * @param value - object used to find proper mapper
          * @return mapper for given object or null if mapper for it doesn't exist
          */
         @JvmStatic
+        @Deprecated(
+            "Use method with clazz param instead. Deprecated since: 0.3.2",
+            replaceWith = ReplaceWith("AbstractMapper.of(T::class.java)")
+        )
         fun<T> of(value: T): AbstractMapper<T>? where T : Any {
             // Load MapperUtils to provide correct mapper factory
             Class.forName("io.github.newagewriter.processor.mapper.GeneratedMapperFactory")
             return Factory.of(value)
+        }
+
+        /**
+         * Method get proper mapper instance for given object
+         * @param clazz - java class instance for [T] type
+         * @return mapper for given object or null if mapper for it doesn't exist
+         */
+        @JvmStatic
+        fun<T> of(clazz: Class<T>): AbstractMapper<T>? where T : Any {
+            // Load MapperUtils to provide correct mapper factory
+            Class.forName("io.github.newagewriter.processor.mapper.GeneratedMapperFactory")
+            return Factory.forClass(clazz)
         }
 
         /**
@@ -209,10 +264,8 @@ abstract class AbstractMapper<T> protected constructor(
          * @return object of given type or null if that conversion cannot be made
          */
         @JvmStatic
-        fun<T> toObject(objClass: Class<T>, map: Map<String, Any?>): T? where T : Any {
-            Class.forName("io.github.newagewriter.processor.mapper.GeneratedMapperFactory")
-            val mapper = Factory.forClass(objClass, map)
-            return mapper?.getMappedObj()
+        fun<T : Any> toObject(objClass: Class<T>, map: Map<String, Any?>): T {
+            return ofOrThrow(objClass).mapToModel(map)
         }
 
         /**
@@ -223,8 +276,8 @@ abstract class AbstractMapper<T> protected constructor(
          * @return object of given type or null if that conversion cannot be made
          */
         @JvmStatic
-        fun<T> fromJsonToObject(objClass: Class<T>, stream: InputStream, charset: Charset = Charsets.UTF_8): T? where T : Any {
-            return toObject(objClass, JsonWrapper.jsonToMap(stream, charset))
+        fun<T : Any> fromJsonToObject(objClass: Class<T>, stream: InputStream, charset: Charset = Charsets.UTF_8): T? {
+            return of(objClass)?.mapToModel(JsonWrapper.jsonToMap(stream, charset))
         }
 
         /**
@@ -234,8 +287,8 @@ abstract class AbstractMapper<T> protected constructor(
          * @return object of given type or null if that conversion cannot be made
          */
         @JvmStatic
-        fun<T> fromJsonToObject(objClass: Class<T>, jsonString: String): T? where T : Any {
-            return toObject(objClass, JsonWrapper.jsonToMap(jsonString))
+        fun<T : Any> fromJsonToObject(objClass: Class<T>, jsonString: String): T? {
+            return of(objClass)?.mapToModel(JsonWrapper.jsonToMap(jsonString))
         }
 
         /**
@@ -246,9 +299,9 @@ abstract class AbstractMapper<T> protected constructor(
          * @return array containing object of given type or empty list if that conversion cannot be made
          */
         @JvmStatic
-        fun<T> fromJsonToArray(objClass: Class<T>, stream: InputStream, charset: Charset = Charsets.UTF_8): List<T?> where T : Any {
+        fun<T : Any> fromJsonToArray(objClass: Class<T>, stream: InputStream, charset: Charset = Charsets.UTF_8): List<T?> {
             return JsonWrapper.jsonToArray(stream, charset).map { map ->
-                toObject(objClass, map)
+                of(objClass)?.mapToModel(map)
             }.toList()
         }
 
@@ -261,17 +314,17 @@ abstract class AbstractMapper<T> protected constructor(
         @JvmStatic
         fun<T> fromJsonToArray(objClass: Class<T>, jsonString: String): List<T?> where T : Any {
             return JsonWrapper.jsonToArray(jsonString).map { map ->
-                toObject(objClass, map)
+                of(objClass)?.mapToModel(map)
             }.toList()
         }
 
         private fun getColorJavaConverters(): Pair<String, GenericConverter<*, *>>? {
-            try {
+            return try {
                 val clazz = Class.forName("java.awt.Color")
                 val converterClass: Class<GenericConverter<*, *>> = Class.forName("io.github.newagewriter.processor.converter.ColorConverter") as Class<GenericConverter<*, *>>
-                return clazz.simpleName to converterClass.getDeclaredConstructor().newInstance()
+                clazz.simpleName to converterClass.getDeclaredConstructor().newInstance()
             } catch (ex: ClassNotFoundException) {
-                return null
+                null
             }
         }
     }

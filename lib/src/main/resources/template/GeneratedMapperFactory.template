@@ -15,20 +15,38 @@ object GeneratedMapperFactory : MapperFactory {
     }
 
     @Suppress("UNCHECKED_CAST")
-    public override fun <T> of(obj: T): AbstractMapper<T>? where T : Any {
+    @Deprecated(
+            "Use forClass instead. Deprecated since 0.4.0, will be removed in 0.5.0.",
+            replaceWith = ReplaceWith("forClass(clazz: Class<T>)")
+        )
+    public override fun <T : Any> of(obj: T): AbstractMapper<T>? {
         when(obj) {
         @foreach($types):
-            is $element -> return ${element}Mapper(obj) as AbstractMapper<T>
+            is $element -> return ${element}Mapper(obj, null) as AbstractMapper<T>
         @end
             else -> return null
         }
     }
 
     @Suppress("UNCHECKED_CAST")
-    public override fun <T> forClass(obj: Class<T>, map: Map<String, Any?>): AbstractMapper<T>? where T : Any {
+    @Deprecated(
+            "Use forClass with only clazz param. Deprecated since 0.4.0, will be remove in 0.5.0. ",
+            replaceWith = ReplaceWith("forClass(clazz: Class<T>)")
+        )
+    public override fun <T : Any> forClass(obj: Class<T>, map: Map<String, Any?>): AbstractMapper<T>? {
         when(obj.simpleName) {
         @foreach($types):
             $element::class.java.simpleName -> return ${element}Mapper(null, map) as AbstractMapper<T>
+        @end
+            else -> return null
+        }
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    public override fun <T : Any> forClass(clazz: Class<T>): AbstractMapper<T>? {
+        when(clazz.simpleName) {
+        @foreach($types):
+            $element::class.java.simpleName -> return ${element}Mapper(clazz as Class<$element>) as AbstractMapper<T>
         @end
             else -> return null
         }
