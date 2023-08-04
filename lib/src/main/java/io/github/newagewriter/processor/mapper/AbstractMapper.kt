@@ -6,7 +6,6 @@ import io.github.newagewriter.processor.converter.GenericConverter
 import io.github.newagewriter.processor.converter.PrimitiveConverter
 import io.github.newagewriter.processor.exception.MissingMapperException
 import java.io.InputStream
-import java.io.InvalidClassException
 import java.lang.reflect.InvocationTargetException
 import java.nio.charset.Charset
 import java.util.*
@@ -29,8 +28,7 @@ abstract class AbstractMapper<T> protected constructor(
     protected var objMap: Map<String, Any?>? = null
 
     @Deprecated("use constructor with class instance param instead. Deprecated since 0.4.0, will be removed in 0.5.0")
-    constructor(obj: T?, map: Map<String, Any?>? )
-            : this(obj?.javaClass ?: throw ExceptionInInitializerError("obj is null cannot get class instance")) {
+    constructor(obj: T?, map: Map<String, Any?>?) : this(obj?.javaClass ?: throw ExceptionInInitializerError("obj is null cannot get class instance")) {
         this.obj = obj
         this.objMap = map
     }
@@ -46,7 +44,7 @@ abstract class AbstractMapper<T> protected constructor(
      * Method convert object [obj] to Map
      * @return map with all fields from object [obj]
      */
-    @Deprecated("use toMap with [T] params instead", replaceWith = ReplaceWith("toMap(obj)"))
+    @Deprecated("use toMap with [T] params instead", replaceWith = ReplaceWith("this.toMap(model)"))
     fun toMap(): Map<String, Any?> {
         return toMap(obj ?: throw NullPointerException(""))
     }
@@ -71,6 +69,10 @@ abstract class AbstractMapper<T> protected constructor(
         return mapToModel(objMap ?: throw java.lang.NullPointerException("Map is null"))
     }
 
+    @Deprecated(
+        "Use toJson(obj: T) instead",
+        replaceWith = ReplaceWith("this.toJson(model)")
+    )
     fun toJson(): String {
         return toJson(obj ?: throw NullPointerException("Object is null"))
     }
@@ -100,9 +102,10 @@ abstract class AbstractMapper<T> protected constructor(
      * @param map - map of properties that will be converted to fields
      * @return object of [T] class
      */
-    @Deprecated("Use mapToModel(map: Map<String, Any?> instead. " +
-            "Deprecated since 0.4.0, will be removed in 0.5.0 version",
-        ReplaceWith("mapToModel(map)"))
+    @Deprecated(
+        "Use mapToModel(map: Map<String, Any?> instead. Deprecated since 0.4.0, will be removed in 0.5.0 version",
+        ReplaceWith("mapToModel(map)")
+    )
     fun getMappedObj(map: Map<String, Any?>): T {
         return createMappedObj()
     }
@@ -164,6 +167,49 @@ abstract class AbstractMapper<T> protected constructor(
         throw InvocationTargetException(Exception("Cannot find constructor for given map: $map"))
     }
 
+    /**
+     * Convert json string to model
+     * @param jsonString - json to convert
+     * @return model of specific class
+     */
+    fun jsonToModel(jsonString: String): T {
+        return mapToModel(JsonWrapper.jsonToMap(jsonString))
+    }
+
+    /**
+     * Convert stream to model
+     * @param stream - stream that contains json
+     * @param charset - coding style by default UTF-8
+     * @return model of specific class
+     */
+    fun jsonToModel(stream: InputStream, charset: Charset = Charsets.UTF_8): T {
+        return mapToModel(JsonWrapper.jsonToMap(stream, charset))
+    }
+
+    /**
+     * Convert stream to model
+     * @param stream - stream that contains json
+     * @param charset - coding style by default UTF-8
+     * @return model of specific class
+     */
+    fun jsonToListOfModels(jsonString: String): List<T?> {
+        return JsonWrapper.jsonToArray(jsonString).map { map ->
+            of(clazz)?.mapToModel(map)
+        }.toList()
+    }
+
+    /**
+     * Convert stream to model
+     * @param stream - stream that contains json
+     * @param charset - coding style by default UTF-8
+     * @return model of specific class
+     */
+    fun jsonToListOfModels(stream: InputStream, charset: Charset = Charsets.UTF_8): List<T?> {
+        return JsonWrapper.jsonToArray(stream, charset).map { map ->
+            of(clazz)?.mapToModel(map)
+        }.toList()
+    }
+
     @Suppress("UNCHECKED_CAST")
     companion object {
         lateinit var Factory: MapperFactory
@@ -203,7 +249,7 @@ abstract class AbstractMapper<T> protected constructor(
             } else if (element is Map<*, *>) {
                 toObject(type, element as Map<String, Any?>)
             } else {
-                throw InvalidClassException("Cannot cast $element to class ${type.simpleName}")
+                element as U
             }
         }
 
@@ -236,7 +282,7 @@ abstract class AbstractMapper<T> protected constructor(
          */
         @JvmStatic
         @Deprecated(
-            "Use method with clazz param instead. Deprecated since: 0.3.2",
+            "Use method with clazz param instead. Deprecated since: 0.4.0",
             replaceWith = ReplaceWith("AbstractMapper.of(T::class.java)")
         )
         fun<T> of(value: T): AbstractMapper<T>? where T : Any {
@@ -263,6 +309,10 @@ abstract class AbstractMapper<T> protected constructor(
          * @param map - map with values
          * @return object of given type or null if that conversion cannot be made
          */
+        @Deprecated(
+            "Use method from mapper instance mapToModel(map: Map<String, Any?>) instead. Deprecated since: 0.4.0",
+            replaceWith = ReplaceWith("AbstractMapper.of(T::class.java).mapToModel(map)")
+        )
         @JvmStatic
         fun<T : Any> toObject(objClass: Class<T>, map: Map<String, Any?>): T {
             return ofOrThrow(objClass).mapToModel(map)
@@ -275,6 +325,10 @@ abstract class AbstractMapper<T> protected constructor(
          * @param charset - Charset format for given stream
          * @return object of given type or null if that conversion cannot be made
          */
+        @Deprecated(
+            "Use method from mapper instance jsonToModel(map: Map<String, Any?>) instead. Deprecated since: 0.4.0",
+            replaceWith = ReplaceWith("AbstractMapper.of(T::class.java).jsonToModel(stream, charset)")
+        )
         @JvmStatic
         fun<T : Any> fromJsonToObject(objClass: Class<T>, stream: InputStream, charset: Charset = Charsets.UTF_8): T? {
             return of(objClass)?.mapToModel(JsonWrapper.jsonToMap(stream, charset))

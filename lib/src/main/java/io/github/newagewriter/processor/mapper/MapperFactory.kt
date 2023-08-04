@@ -32,5 +32,5 @@ interface MapperFactory {
      * @param clazz - Instance of Class for given type
      * @return instance of mapper for given class or null if mapper for this class doesn't exist
      */
-    fun<T : Any> forClass(clazz: Class<T>): AbstractMapper<T>?
+    fun<T> forClass(clazz: Class<T>): AbstractMapper<T>? where T : Any
 }

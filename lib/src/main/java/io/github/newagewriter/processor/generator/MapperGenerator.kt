@@ -2,6 +2,7 @@ package io.github.newagewriter.processor.generator
 
 import io.github.newagewriter.annotation.Exclude
 import io.github.newagewriter.annotation.Field
+import io.github.newagewriter.processor.ProcessorLogger
 import io.github.newagewriter.processor.converter.MapperConverter
 import io.github.newagewriter.template.TemplateLoader
 import java.io.IOException
@@ -67,6 +68,7 @@ class MapperGenerator private constructor() {
             val key = fieldAnnotation?.name ?: e.simpleName.toString()
             key to e.simpleName.toString()
         }
+        ProcessorLogger.logD("[KB]", "element: $el")
         val fields = getFields(el)
             .map { e ->
                 val fieldAnnotation = e.getAnnotation(Field::class.java)
@@ -91,6 +93,7 @@ class MapperGenerator private constructor() {
         } catch (ex: IOException) {
             ex.printStackTrace()
         }
+        ProcessorLogger.logD("[KB]", "******************END element: $el")
         return content.toString()
     }
 

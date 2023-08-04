@@ -36,7 +36,7 @@ object GeneratedMapperFactory : MapperFactory {
     public override fun <T : Any> forClass(obj: Class<T>, map: Map<String, Any?>): AbstractMapper<T>? {
         when(obj.simpleName) {
         @foreach($types):
-            $element::class.java.simpleName -> return ${element}Mapper(null, map) as AbstractMapper<T>
+            $element::class.java.simpleName -> return ${element}Mapper($element::class.java) as AbstractMapper<T>
         @end
             else -> return null
         }
@@ -46,7 +46,7 @@ object GeneratedMapperFactory : MapperFactory {
     public override fun <T : Any> forClass(clazz: Class<T>): AbstractMapper<T>? {
         when(clazz.simpleName) {
         @foreach($types):
-            $element::class.java.simpleName -> return ${element}Mapper(clazz as Class<$element>) as AbstractMapper<T>
+            $element::class.java.simpleName -> return ${element}Mapper($element::class.java) as AbstractMapper<T>
         @end
             else -> return null
         }

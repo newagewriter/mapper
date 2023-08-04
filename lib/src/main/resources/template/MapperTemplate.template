@@ -9,10 +9,14 @@ import ${classPackage}.${className}
  * All changes made in this class will be remove after rebuild
  */
 class ${className}Mapper(clazz : Class<${className}>) : AbstractMapper<${className}>(clazz) {
-    constructor(obj: ${className}?, objMap: Map<String, Any?>?) : this(obj?.javaClass ?: throw NullPointerException("obj cannot be null")) {
+    @Deprecated("This constructor is deprecated since 0.4.0 and it will be removed in 0.5.0 version. Use constructor with class parameter instead.", ReplaceWith("${className}Mapper(${className}::class.java)"))
+    constructor(obj: ${className}?, objMap: Map<String, Any?>?) : this(${className}::class.java) {
         this.obj = obj
         this.objMap = objMap
     }
+
+    @Deprecated("This constructor is deprecated since 0.4.0 and it will be removed in 0.5.0 version. Use constructor with class parameter instead.", ReplaceWith("${className}Mapper(${className}::class.java)"))
+    constructor(obj: ${className}?) : this(obj, null)
 
     public override fun toMap(obj: ${className}): Map<String, Any?> {
         val result = mapOf<String, Any?>(
