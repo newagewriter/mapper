@@ -8,14 +8,29 @@ package io.github.newagewriter.processor.mapper
 interface MapperFactory {
 
     /**
-     * Method get mapper for given object
+     * Method get mapper for given object. Method is deprecated since 0.4.0, will be remove in 0.5.0
      * @return instance of mapper for given object or null if mapper for object doesn't exist
      */
+    @Deprecated(
+        "Use forClass instead. Deprecated since 0.4.0, will be removed in 0.5.0.",
+        replaceWith = ReplaceWith("forClass(clazz: Class<T>)")
+    )
     fun<T> of(obj: T): AbstractMapper<T>? where T : Any
 
     /**
      * Method get mapper for given class
      * @return instance of mapper for given class or null if mapper for this class doesn't exist
      */
-    fun<T> forClass(obj: Class<T>, map: Map<String, Any?>): AbstractMapper<T>? where T : Any
+    @Deprecated(
+        "Use forClass with only clazz param. Deprecated since 0.4.0, will be remove in 0.5.0. ",
+        replaceWith = ReplaceWith("forClass(clazz: Class<T>)")
+    )
+    fun<T : Any> forClass(obj: Class<T>, map: Map<String, Any?>): AbstractMapper<T>?
+
+    /**
+     * Method get mapper for given class
+     * @param clazz - Instance of Class for given type
+     * @return instance of mapper for given class or null if mapper for this class doesn't exist
+     */
+    fun<T> forClass(clazz: Class<T>): AbstractMapper<T>? where T : Any
 }
