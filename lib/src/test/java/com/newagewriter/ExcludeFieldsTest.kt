@@ -26,6 +26,5 @@ class ExcludeFieldsTest {
             val map = mapper.toMap(model)
             Assertions.assertFalse(map.containsKey("excludeField"))
         } ?: fail("Cannot get mapper for given class")
-
     }
 }

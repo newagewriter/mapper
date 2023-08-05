@@ -263,13 +263,12 @@ abstract class AbstractMapper<T> protected constructor(
         /**
          * Method get proper mapper instance for given object
          * @param clazz - java class instance for [T] type
-         * @return mapper for given object or null if mapper for it doesn't exist
+         * @throws MissingMapperException
+         * @return mapper instance for given class or throw exception
          */
         @JvmStatic
         fun<T> ofOrThrow(clazz: Class<T>): AbstractMapper<T> where T : Any {
-            // Load MapperUtils to provide correct mapper factory
-            Class.forName("io.github.newagewriter.processor.mapper.GeneratedMapperFactory")
-            return Factory.forClass(clazz) ?: throw MissingMapperException("Cannot find mapper for given class: ${clazz.simpleName}")
+            return of(clazz) ?: throw MissingMapperException("Cannot find mapper for given class: ${clazz.simpleName}")
         }
 
         /**
