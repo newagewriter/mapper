@@ -1,5 +1,5 @@
 #!/bin/bash
-RELEASE_VERSION=$(echo $1 | cut -d '/' -f 2 | xargs)
+RELEASE_VERSION=$(echo "$1" | cut -d '/' -f 2 | xargs)
 LAST_VERSION=$(grep -E -o "# $RELEASE_VERSION" ./CHANGELOG.md)
 echo "Current version = $LAST_VERSION"
 if [ -z "$LAST_VERSION" ]; then
