@@ -1,10 +1,11 @@
 #!/bin/bash
-LAST_VERSION=$(grep -E -o "# $1" ./CHANGELOG.md)
+RELEASE_VERSION=$(echo $1 | cut -d '/' -f 2 | xargs)
+LAST_VERSION=$(grep -E -o "# $RELEASE_VERSION" ./CHANGELOG.md)
 echo "Current version = $LAST_VERSION"
 if [ -z "$LAST_VERSION" ]; then
-  echo "Version not match"
+  echo "Missing release note in CHANGELOG.md file"
   exit 1
 else
-  echo "Version is valid"
+  echo "Found release note for version: $LAST_VERSION"
   exit 0
 fi
