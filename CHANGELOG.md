@@ -1,3 +1,12 @@
+# 0.4.0-beta.1
+
+### Feature
+* Add @field annotation to provide set different name for serialization/deserialization: [PR](https://github.com/newagewriter/mapper/pull/77)
+* Add @Exclude annotation, this annotation can be used for field to exclude from serialization: [PR](https://github.com/newagewriter/mapper/pull/78)
+
+### Changes
+* Refactor AbstractMapper to simplify conversions from json/map to model and vice versa: [PR](https://github.com/newagewriter/mapper/pull/79)
+
 # 0.3.1
 
 ### Feature

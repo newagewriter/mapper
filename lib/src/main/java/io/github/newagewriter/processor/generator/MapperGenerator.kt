@@ -1,5 +1,8 @@
 package io.github.newagewriter.processor.generator
 
+import io.github.newagewriter.annotation.Exclude
+import io.github.newagewriter.annotation.Field
+import io.github.newagewriter.processor.ProcessorLogger
 import io.github.newagewriter.processor.converter.MapperConverter
 import io.github.newagewriter.template.TemplateLoader
 import java.io.IOException
@@ -57,9 +60,21 @@ class MapperGenerator private constructor() {
         val packageName = processingEnv.elementUtils.getPackageOf(el)
         val mapperName = el.simpleName
 
-        val fieldsName = getFields(el).map { e -> e.simpleName.toString() }
+        val fieldsName = getFields(el).filter { e ->
+            val excludeAnnotation: Exclude? = e.getAnnotation(Exclude::class.java)
+            excludeAnnotation == null
+        }.associate { e ->
+            val fieldAnnotation: Field? = e.getAnnotation(Field::class.java)
+            val key = fieldAnnotation?.name ?: e.simpleName.toString()
+            key to e.simpleName.toString()
+        }
+        ProcessorLogger.logD("[KB]", "element: $el")
         val fields = getFields(el)
-            .map { e -> e.simpleName to MapperConverter.getValueForType(e) }.toMap()
+            .map { e ->
+                val fieldAnnotation = e.getAnnotation(Field::class.java)
+                val key = "${fieldAnnotation?.name ?: e.simpleName}:${e.simpleName}"
+                key to MapperConverter.getValueForType(e, fieldAnnotation)
+            }.toMap()
         val template = TemplateLoader.load("MapperTemplate")
             .addVariable("className", el.simpleName)
             .addVariable("classPackage", "${packageName.qualifiedName}")
@@ -69,7 +84,7 @@ class MapperGenerator private constructor() {
         try {
             val file = processingEnv.filer.createResource(
                 sourceOutput,
-                "$moduleAndPkg",
+                moduleAndPkg,
                 "${mapperName}Mapper.kt"
             )
             val writer = file.openWriter()
@@ -78,6 +93,7 @@ class MapperGenerator private constructor() {
         } catch (ex: IOException) {
             ex.printStackTrace()
         }
+        ProcessorLogger.logD("[KB]", "******************END element: $el")
         return content.toString()
     }
 

@@ -8,29 +8,34 @@ import ${classPackage}.${className}
  * ${className}Mapper is auto generated class. Do not change this file.
  * All changes made in this class will be remove after rebuild
  */
-class ${className}Mapper(mappedObject : ${className}?, map: Map<String, Any?>? = null) : AbstractMapper<${className}>(mappedObject, map) {
-    constructor(objMap: Map<String, Any?>) : this(null, objMap)
-
-    public override fun toMap(): Map<String, Any?> {
-        return obj?.let { o ->
-            val result = mapOf<String, Any?>(
-            @foreach($fields, separator=","):
-                "$element" to getValue(o.$element)
-            @end
-            )
-            result
-        } ?: throw NullPointerException("Cannot convert object toMap for null value")
+class ${className}Mapper(clazz : Class<${className}>) : AbstractMapper<${className}>(clazz) {
+    @Deprecated("This constructor is deprecated since 0.4.0 and it will be removed in 0.5.0 version. Use constructor with class parameter instead.", ReplaceWith("${className}Mapper(${className}::class.java)"))
+    constructor(obj: ${className}?, objMap: Map<String, Any?>?) : this(${className}::class.java) {
+        this.obj = obj
+        this.objMap = objMap
     }
 
-    public override fun createMappedObj(): ${className} {
-        return  objMap?.let { map ->
-            val convertedMap = mutableMapOf<String, Any?>()
-            @foreach($map as key -> value):
-            if (map.contains("$key")) {
-                convertedMap["$key"] = $value
+    @Deprecated("This constructor is deprecated since 0.4.0 and it will be removed in 0.5.0 version. Use constructor with class parameter instead.", ReplaceWith("${className}Mapper(${className}::class.java)"))
+    constructor(obj: ${className}?) : this(obj, null)
+
+    public override fun toMap(obj: ${className}): Map<String, Any?> {
+        val result = mapOf<String, Any?>(
+        @foreach($fields as key -> value, separator=","):
+            "$key" to getValue(obj.$value)
+        @end
+        )
+        return result
+    }
+
+    public override fun mapToModel(map: Map<String, Any?>): ${className} {
+        val convertedMap = mutableMapOf<String, Any?>()
+        @foreach($map as key -> value):
+        "$key".split(":").let { parts ->
+            if (map.contains(parts[0])) {
+                convertedMap[parts[1]] = $value
             }
-            @end
-            createFromMap(convertedMap, ${className}::class)
-        } ?: throw NullPointerException("Map is null, cannot create object")
+        }
+        @end
+        return createFromMap(convertedMap, ${className}::class)
     }
 }

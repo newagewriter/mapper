@@ -1,5 +1,7 @@
 package io.github.newagewriter.processor.converter
 
+import io.github.newagewriter.annotation.Field
+import io.github.newagewriter.processor.ProcessorLogger
 import io.github.newagewriter.processor.mapper.AbstractMapper
 import java.io.InvalidClassException
 import javax.annotation.processing.ProcessingEnvironment
@@ -80,13 +82,19 @@ object MapperConverter {
         return result.toString()
     }
 
-    fun getValueForType(field: Element): String {
-        if (field.asType().toString().startsWith("java.util.List")) {
+    fun getValueForType(field: Element, fieldAnnotation: Field?): String {
+        val fieldName = fieldAnnotation?.name ?: field.simpleName.toString()
+        ProcessorLogger.logD("[KB]", "field: ${field.asType()}")
+        return if (field.asType().toString().startsWith("java.util.List")) {
             val inListType = (field.asType() as DeclaredType).typeArguments[0]
-            return "MapperConverter.useList($inListType::class.java, map[\"${field.simpleName}\"])"
+            "MapperConverter.useList($inListType::class.java, map[\"$fieldName\"])"
+        } else if (field.asType().toString().startsWith("java.util.Map")) {
+            val keyType = (field.asType() as DeclaredType).typeArguments[0]
+            val valueType = (field.asType() as DeclaredType).typeArguments[1]
+            "MapperConverter.useMap($keyType::class.java, $valueType::class.java, map[\"$fieldName\"])"
         } else {
             val value = getKotlinTypeForElement(field)
-            return "toType($value::class.java, map[\"${field.simpleName}\"])"
+            "toType($value::class.java, map[\"${fieldName}\"])"
         }
     }
 
@@ -114,6 +122,20 @@ object MapperConverter {
                         }
                         else -> result.add(it as U)
                     }
+                }
+                result
+            }
+            else -> null
+        }
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    fun<K, U> useMap(keyClazz: Class<K>, valueClazz: Class<U>, obj: Any?): Map<K, U?>? where U : Any {
+        return when (obj) {
+            is Map<*, *> -> {
+                val result = mutableMapOf<K, U?>()
+                obj.forEach {
+                    if (it.value != null) result[it.key as K] = it.value as U else result[it.key as K] = null
                 }
                 result
             }
