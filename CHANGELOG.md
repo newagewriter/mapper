@@ -1,3 +1,17 @@
+# 0.4.0
+
+### Feature
+* Add @field annotation to provide set different name for serialization/deserialization: [PR](https://github.com/newagewriter/mapper/pull/77)
+* Add @Exclude annotation, this annotation can be used for field to exclude from serialization: [PR](https://github.com/newagewriter/mapper/pull/78)
+* Add deserialization for fields not included in model constructor [PR](https://github.com/newagewriter/mapper/pull/84)
+
+### Changes
+* Refactor AbstractMapper to simplify conversions from json/map to model and vice versa: [PR](https://github.com/newagewriter/mapper/pull/79)
+* Create new version AbstractMapper.of method that use model class object as a parameter, old version is mark as deprecated
+
+### Fixes
+* Fix issue with generated mapper for static field for model [PR](https://github.com/newagewriter/mapper/pull/85)
+
 # 0.4.0-beta.1
 
 ### Feature
