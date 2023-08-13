@@ -151,13 +151,28 @@ abstract class AbstractMapper<T> protected constructor(
                     params[p.name ?: "<UNKNOWN>"] = p
                 }
             }
-            if (map.keys.containsAll(params.keys) && map.keys.size == params.size) {
+            if (map.keys.containsAll(params.keys)) {
                 try {
+                    val additionalValues = mutableMapOf<String, Any?>()
                     return c.callBy(
                         map.mapKeys { p ->
-                            params[p.key]!!
+                            if (params[p.key] == null) {
+                                additionalValues[p.key] = p.value
+                            }
+                            params[p.key]
+                        }.filterKeys { k ->
+                            k != null
+                        } as Map<KParameter, Any>
+                    ).apply {
+                        val applyClass = this.javaClass
+                        additionalValues.forEach { entry ->
+                            println("entry: ${entry.key}")
+                            applyClass.getDeclaredField(entry.key)?.let { f ->
+                                f.isAccessible = true
+                                f.set(this, entry.value)
+                            }
                         }
-                    )
+                    }
                 } catch (e: IllegalArgumentException) {
                     println("exception: ${e.message}")
                     e.printStackTrace()
