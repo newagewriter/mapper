@@ -2,13 +2,13 @@ package io.github.newagewriter.processor.generator
 
 import io.github.newagewriter.annotation.Exclude
 import io.github.newagewriter.annotation.Field
-import io.github.newagewriter.processor.ProcessorLogger
 import io.github.newagewriter.processor.converter.MapperConverter
 import io.github.newagewriter.template.TemplateLoader
 import java.io.IOException
 import java.lang.StringBuilder
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.Element
+import javax.lang.model.element.Modifier
 import javax.tools.StandardLocation
 
 class MapperGenerator private constructor() {
@@ -62,15 +62,16 @@ class MapperGenerator private constructor() {
 
         val fieldsName = getFields(el).filter { e ->
             val excludeAnnotation: Exclude? = e.getAnnotation(Exclude::class.java)
-            excludeAnnotation == null
+            excludeAnnotation == null && !e.modifiers.contains(Modifier.STATIC)
         }.associate { e ->
             val fieldAnnotation: Field? = e.getAnnotation(Field::class.java)
             val key = fieldAnnotation?.name ?: e.simpleName.toString()
             key to e.simpleName.toString()
         }
-        ProcessorLogger.logD("[KB]", "element: $el")
         val fields = getFields(el)
-            .map { e ->
+            .filter { e ->
+                !e.modifiers.contains(Modifier.STATIC)
+            }.map { e ->
                 val fieldAnnotation = e.getAnnotation(Field::class.java)
                 val key = "${fieldAnnotation?.name ?: e.simpleName}:${e.simpleName}"
                 key to MapperConverter.getValueForType(e, fieldAnnotation)
@@ -93,7 +94,6 @@ class MapperGenerator private constructor() {
         } catch (ex: IOException) {
             ex.printStackTrace()
         }
-        ProcessorLogger.logD("[KB]", "******************END element: $el")
         return content.toString()
     }
 

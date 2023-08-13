@@ -34,6 +34,10 @@ jobs:
       - run: ./gradlew clean assemble
       - run: echo "🍏 This job's status is ${{ job.status }}."
       - run: echo "🍏 check tag lib-${{ github.ref_name }}.jar"
+      - name: Prepare release note
+        run: |
+          sudo chmod +x scripts/get_release_note.sh
+          scripts/get_release_note.sh
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -42,6 +46,7 @@ jobs:
         with:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref_name }}
+          body_path: ./tmp_release_note.txt
           draft: false
           prerelease: ${{ contains(github.ref_name, 'beta') }}
       - name: upload artifact
