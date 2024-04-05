@@ -88,8 +88,8 @@ abstract class AbstractMapper<T> protected constructor(
         var first = true
         result.forEach { entry ->
             if (!first) builder.appendLine(",")
-
-            builder.append("    \"${entry.key}\" : ${entry.value}")
+            val value = if (entry.value is String) "\"${entry.value}\"" else entry.value
+            builder.append("    \"${entry.key}\" : ${value}")
             first = false
         }
         builder.appendLine("\n}")
@@ -119,7 +119,7 @@ abstract class AbstractMapper<T> protected constructor(
                 is Long,
                 is Short,
                 is Boolean -> v
-                is String -> "\"$v\""
+                is String -> "$v"
                 is Enum<*> -> v.name
                 else -> of(v.javaClass)?.toJson(v) ?: "$v"
             }
