@@ -181,7 +181,6 @@ From version 0.4.0 to exclude a field from serialization process add annotation 
         println("name: ${m.name}")
     }
    ```
-   
 </details>
 
 ## Add your own converter
