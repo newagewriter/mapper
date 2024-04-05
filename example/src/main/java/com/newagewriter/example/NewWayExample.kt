@@ -22,6 +22,7 @@ fun main(args: Array<String>) {
 
         val jsonString = "{ \"id\" : 123, \"name\" : \"Test\" }"
         val modelFromJson = m.jsonToModel(json)
+        println("model from json: $modelFromJson")
 
     }
 

@@ -86,6 +86,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib"
     implementation "org.jetbrains.kotlin:kotlin-reflect"
     implementation 'com.google.auto.service:auto-service:1.0.1'
+    implementation "io.github.newagewriter:kt-generator:0.1.0-beta.5"
 //    implementation project(":json_library")
     implementation ("com.googlecode.json-simple:json-simple:1.1.1") {
         exclude group: 'org.hamcrest', module: 'hamcrest-core'
