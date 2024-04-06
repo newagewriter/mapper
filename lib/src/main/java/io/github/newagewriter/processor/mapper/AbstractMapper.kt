@@ -89,7 +89,7 @@ abstract class AbstractMapper<T> protected constructor(
         result.forEach { entry ->
             if (!first) builder.appendLine(",")
             val value = if (entry.value is String) "\"${entry.value}\"" else entry.value
-            builder.append("    \"${entry.key}\" : ${value}")
+            builder.append("    \"${entry.key}\" : $value")
             first = false
         }
         builder.appendLine("\n}")
