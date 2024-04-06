@@ -19,7 +19,7 @@ class UseFieldAnnotationTest {
             val toMap = mapper.toMap()
             // check if map contains key _id (not id)
             Assertions.assertTrue(toMap.containsKey("_id"))
-            Assertions.assertEquals(toMap["_id"], id)
+            Assertions.assertEquals(toMap["_id"] as String, id)
 
             Assertions.assertEquals(toMap["name"], name)
             Assertions.assertEquals(toMap["value"], value)

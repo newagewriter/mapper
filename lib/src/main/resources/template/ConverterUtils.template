@@ -4,9 +4,9 @@ object ConverterUtils {
     @JvmStatic
     public fun initConverters(): Map<String, GenericConverter<*, *>> {
         val converters = HashMap<String, GenericConverter<*, *>>()
-        @foreach($map as key -> value):
+        #foreach($map as key -> value):
         converters.put("$key", $value())
-        @end
+        #endforeach
         return converters
 
     }
