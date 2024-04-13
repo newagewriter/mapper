@@ -14,6 +14,7 @@ import javax.annotation.processing.SupportedSourceVersion
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
+import javax.script.ScriptEngineManager
 import javax.tools.Diagnostic
 import javax.tools.StandardLocation
 
@@ -24,6 +25,13 @@ class MapperProcessor : AbstractProcessor() {
     override fun process(annotations: MutableSet<out TypeElement>?, roundEnv: RoundEnvironment?): Boolean {
         try {
             ProcessorLogger.startLogger(processingEnv)
+            ProcessorLogger.logD("[KB]", "----- START LOGGIN -----")
+            val scriptManager = ScriptEngineManager()
+            scriptManager.getEngineByName("kotlin")?.let { engine ->
+                val myString = "test"
+                val value = engine.eval("\"com.st\" == \"\"")
+            }
+
             processingEnv.messager.printMessage(Diagnostic.Kind.NOTE, "process mappers")
             val mapperList = mutableMapOf<String, String>()
             roundEnv?.getElementsAnnotatedWith(Mapper::class.java)?.forEach { el ->
@@ -53,6 +61,8 @@ class MapperProcessor : AbstractProcessor() {
             writer.close()
         } catch (ex: IOException) {
             ex.printStackTrace()
+        } catch (ex: Exception) {
+            ProcessorLogger.logD("[KB]", "exception: $ex")
         } finally {
             ProcessorLogger.stop()
         }

@@ -88,8 +88,8 @@ abstract class AbstractMapper<T> protected constructor(
         var first = true
         result.forEach { entry ->
             if (!first) builder.appendLine(",")
-
-            builder.append("    \"${entry.key}\" : ${getValue(entry.value)}")
+            val value = if (entry.value is String) "\"${entry.value}\"" else entry.value
+            builder.append("    \"${entry.key}\" : $value")
             first = false
         }
         builder.appendLine("\n}")

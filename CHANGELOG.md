@@ -1,3 +1,12 @@
+# 0.4.1-beta.1
+
+### Feature
+* Improve kotlin class generator. Right now it use kt-generator library: https://github.com/newagewriter/kt-generator
+
+### Fixes
+* Fix regression with missing "" for string variable in generated json file.
+* Fix mapper generator for class without package.
+
 # 0.4.0
 
 ### Feature
