@@ -2,6 +2,7 @@ package io.github.newagewriter.processor.generator
 
 import io.github.newagewriter.annotation.Exclude
 import io.github.newagewriter.annotation.Field
+import io.github.newagewriter.processor.ProcessorLogger
 import io.github.newagewriter.processor.converter.MapperConverter
 import io.github.newagewriter.template.TemplateLoader
 import java.io.IOException
@@ -83,6 +84,8 @@ class MapperGenerator private constructor() {
             .addVariable("map", fields)
 
         try {
+            ProcessorLogger.logD("[KB]","check fieldsName size: ${fieldsName.size}")
+            ProcessorLogger.logD("[KB]","check fields size: ${fields.size}")
             val file = processingEnv.filer.createResource(
                 sourceOutput,
                 moduleAndPkg,

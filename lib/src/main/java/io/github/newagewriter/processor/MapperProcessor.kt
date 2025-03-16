@@ -62,7 +62,7 @@ class MapperProcessor : AbstractProcessor() {
         } catch (ex: IOException) {
             ex.printStackTrace()
         } catch (ex: Exception) {
-            ProcessorLogger.logD("[KB]", "exception: $ex")
+            ProcessorLogger.logE("[KB]", "exception: $ex", ex)
         } finally {
             ProcessorLogger.stop()
         }
